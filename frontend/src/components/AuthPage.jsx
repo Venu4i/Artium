@@ -28,7 +28,7 @@ return () => clearInterval(interval);
 
 return (
 <div className="min-h-screen flex items-center justify-center bg-[#1a1625] text-white p-4">
-    <div className="flex flex-col md:flex-row bg-[#241f36] rounded-3xl overflow-hidden shadow-2xl max-w-5xl w-full">
+    <div className="flex flex-col md:flex-row bg-[#241f36] rounded-xl overflow-hidden shadow-2xl max-w-5xl w-full">
 
     {/* Left Side: Slideshow */}
     <div className="w-full md:w-1/2 relative h-[550px] overflow-hidden">
@@ -42,7 +42,7 @@ return (
             key={i}
             src={slide.src}
             alt={`slide-${i}`}
-            className="w-full h-full object-cover flex shrink-0"
+            className="w-full h-full object-cover flex shrink-0 p-4"
             />
         ))}
         </div>
