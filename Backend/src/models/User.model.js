@@ -46,6 +46,8 @@ const userModel = new mongoose.Schema({
     default: ""
   },
 
+  joinedCommunities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Community" }],
+
   // Interactions
   likedPosts: [
     {

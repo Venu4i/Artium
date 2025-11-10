@@ -32,9 +32,11 @@ app.use(cookieParser());
 
 // Routes
 import userRouter from "./routes/user.routes.js";
+import communityRouter from './routes/community.routes.js';
 
 // Route declarations
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/community", communityRouter);
 
 // Global error handler
 app.use((err, _, res, next) => {
