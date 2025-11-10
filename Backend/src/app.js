@@ -1,16 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+// src/app.js
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
-import connectDB from './DB/index.js';
-
-// req in frontend connect
-// npm i @react-oauth/google
 
 dotenv.config();
 
-// Cloudinary configuration
+// ✅ Cloudinary configuration
 cloudinary.v2.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API,
@@ -18,27 +15,31 @@ cloudinary.v2.config({
 });
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors({
+// ✅ Middleware
+app.use(
+  cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
-}));
+  })
+);
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-// Routes
+// ✅ Routes
 import userRouter from "./routes/user.routes.js";
-import communityRouter from './routes/community.routes.js';
+import messageRouter from "./routes/message.routes.js";
+import commentRouter from "./routes/comment.routes.js";
+import notificationRouter from "./routes/notification.routes.js";
 
-// Route declarations
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/community", communityRouter);
+app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
-// Global error handler
+// ✅ Global error handler
 app.use((err, _, res, next) => {
   console.error("🔥 Error Handler:", err);
 
@@ -53,10 +54,4 @@ app.use((err, _, res, next) => {
   });
 });
 
-// Start server & connect to DB
-app.listen(port, () => {
-  console.log(`Server running on port ${port}...`);
-  connectDB();
-});
-
-export { app };
+export default app;
