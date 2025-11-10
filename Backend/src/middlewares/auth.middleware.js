@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import jwt from "jsonwebtoken";
-import User from "../models/UserModel.js";
+import User from "../models/User.model.js";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   const bearerToken = req.header("Authorization");

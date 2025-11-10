@@ -8,8 +8,8 @@ import {
   getUser,
   changePassword,
   editProfile
-} from "../controllers/auth.controller.js";
-import { verifyJWT } from "../middleware/verifyJWT.js";
+} from "../controllers/user.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import multer from "multer";
 
 const router = express.Router();

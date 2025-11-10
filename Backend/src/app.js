@@ -3,7 +3,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
-import connectDB from './Db/index.js';
+import connectDB from './DB/index.js';
+
+// req in frontend connect
+// npm i @react-oauth/google
 
 dotenv.config();
 

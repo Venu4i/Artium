@@ -1,11 +1,11 @@
-import User from "../models/UserModel.js";
+import User from "../models/User.model.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import getDataUrl from "../utils/urlGenerator.js";
-import cloudinary from "../config/cloudinary.js";
+//import cloudinary from "../config/cloudinary.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -254,7 +254,7 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const editProfile = asyncHandler(async (req, res) => {
-  const userId = req.id;
+  const userId = req.user._id;
   const { bio, gender } = req.body;
   const profilePicture = req.file;
   let cloudResponse;
