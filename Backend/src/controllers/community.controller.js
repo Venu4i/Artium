@@ -10,13 +10,14 @@ import crypto from "crypto";
  * @route POST /api/community/create
  */
 export const createCommunity = asyncHandler(async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, isPrivate } = req.body;
 
     if (!name) throw new ApiError(400, "Community name is required");
 
     const community = await Community.create({
         name,
         description,
+        isPrivate,
         admin: req.user._id,
         members: [req.user._id],
     });
@@ -30,17 +31,40 @@ export const createCommunity = asyncHandler(async (req, res) => {
  * @route POST /api/community/:id/join
  */
 export const sendJoinRequest = asyncHandler(async (req, res) => {
-    const { id } = req.params; // communityId
-
+    const { id } = req.params;
     const community = await Community.findById(id);
+
     if (!community) throw new ApiError(404, "Community not found");
 
+    // CASE 1: Public Community (Direct Join)
+    if (!community.isPrivate) {
+        if (!community.members.includes(req.user._id)) {
+            community.members.push(req.user._id);
+            await community.save();
+
+            // 🔔 Emit to Community Room
+            req.io.to(id).emit("new_member_joined", {
+                userId: req.user._id,
+                username: req.user.username
+            });
+        }
+        return res.status(200).json(new ApiResponse(200, community, "Joined successfully"));
+    }
+
+    // CASE 2: Private Community (Request needed)
     const existing = await JoinRequest.findOne({ community: id, user: req.user._id });
     if (existing) throw new ApiError(400, "Request already sent");
 
     const request = await JoinRequest.create({ community: id, user: req.user._id });
 
-    res.status(201).json(new ApiResponse(201, request, "Join request sent"));
+    // 🔔 Emit to Admin's Private Room
+    req.io.to(community.admin.toString()).emit("notification", {
+        type: "JOIN_REQUEST",
+        message: `${req.user.username} wants to join ${community.name}`,
+        data: { requestId: request._id, communityId: id }
+    });
+
+    res.status(201).json(new ApiResponse(201, request, "Request sent"));
 });
 
 
@@ -82,15 +106,31 @@ export const handleJoinRequest = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Request not found");
 
     if (action === "approve") {
-        // Add user to community
-        if (!community.members.includes(request.user)) {
-            community.members.push(request.user);
+        if (!community.members.includes(request.user._id)) {
+            community.members.push(request.user._id);
         }
         request.status = "approved";
+
+        // 🔔 Notify User: Request Approved
+        req.io.to(request.user._id.toString()).emit("notification", {
+            type: "REQUEST_APPROVED",
+            message: `Welcome! You have been added to ${community.name}`,
+            data: { communityId: id }
+        });
+
+        // 🔔 Notify Community: New Member
+        req.io.to(id).emit("new_member_joined", {
+            userId: request.user._id,
+            username: request.user.username
+        });
+
     } else if (action === "reject") {
         request.status = "rejected";
-    } else {
-        throw new ApiError(400, "Invalid action");
+        // 🔔 Notify User: Request Rejected
+        req.io.to(request.user._id.toString()).emit("notification", {
+            type: "REQUEST_REJECTED",
+            message: `Your request to join ${community.name} was rejected`,
+        });
     }
 
     await request.save();
@@ -154,9 +194,14 @@ export const acceptInvite = asyncHandler(async (req, res) => {
 
     if (!community.members.includes(req.user._id)) {
         community.members.push(req.user._id);
+        await community.save();
+
+        // 🔔 Notify Community: New Member
+        req.io.to(community._id.toString()).emit("new_member_joined", {
+            userId: req.user._id,
+            username: req.user.username
+        });
     }
 
-    await community.save();
-
-    res.json(new ApiResponse(200, null, "Joined community successfully"));
+    res.json(new ApiResponse(200, null, "Joined via invite"));
 });

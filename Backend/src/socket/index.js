@@ -47,7 +47,13 @@ export function initSocket(server, options = {}) {
     if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
     onlineUsers.get(userId).add(socket.id);
 
-    socket.join(`user:${userId}`); // personal room
+    socket.on("setup", (userData) => {
+      if(userData?._id) {
+        socket.join(`user:${userData._id}`);
+        socket.emit("connected");
+        console.log(`👤 User joined private room: ${userData._id}`);
+      }
+    });
 
     // ✅ Community Join/Leave
     socket.on("joinCommunity", (communityId) => {
@@ -155,4 +161,11 @@ export function initSocket(server, options = {}) {
   }
 
   return { io, onlineUsers, emitNotification };
+}
+
+export function getIO() {
+  if (!io) {
+    throw new Error("Socket.io not initialized!");
+  }
+  return io;
 }
