@@ -5,12 +5,16 @@ import jwt from "jsonwebtoken";
 import Message from "../models/Message.model.js";
 import Comment from "../models/Comment.model.js";
 
+// 🔴 CRITICAL FIX: Declare 'io' globally in this module so getIO can access it
+let io;
+
 /**
  * Initializes socket.io server
  * Called from src/server.js
  */
 export function initSocket(server, options = {}) {
-  const io = new Server(server, {
+  // 🔴 FIX: remove 'const' so we update the global 'io' variable
+  io = new Server(server, {
     cors: {
       origin: options.corsOrigin || "http://localhost:5173",
       credentials: true,
@@ -47,15 +51,16 @@ export function initSocket(server, options = {}) {
     if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
     onlineUsers.get(userId).add(socket.id);
 
+    // 1. Setup (Private User Room)
     socket.on("setup", (userData) => {
       if(userData?._id) {
         socket.join(`user:${userData._id}`);
         socket.emit("connected");
-        console.log(`👤 User joined private room: ${userData._id}`);
+        console.log(`👤 User joined private room: user:${userData._id}`);
       }
     });
 
-    // ✅ Community Join/Leave
+    // 2. Community Join/Leave
     socket.on("joinCommunity", (communityId) => {
       socket.join(`community:${communityId}`);
       console.log(`${socket.user.username} joined community:${communityId}`);
@@ -65,7 +70,7 @@ export function initSocket(server, options = {}) {
       socket.leave(`community:${communityId}`);
     });
 
-    // ✅ Post-specific join (for comments)
+    // 3. Post-specific join
     socket.on("joinPost", (postId) => {
       socket.join(`post:${postId}`);
       console.log(`${socket.user.username} joined post:${postId}`);
@@ -75,7 +80,7 @@ export function initSocket(server, options = {}) {
       socket.leave(`post:${postId}`);
     });
 
-    // ✅ Comment: create and broadcast
+    // 4. Comment: create and broadcast
     socket.on("comment:create", async (payload, ack) => {
       try {
         const comment = await Comment.create({
@@ -88,18 +93,6 @@ export function initSocket(server, options = {}) {
         // Emit new comment to post subscribers
         io.to(`post:${payload.postId}`).emit("comment:new", { comment });
 
-        // Optionally create a notification for post owner (example)
-        // const post = await Post.findById(payload.postId);
-        // if (post && post.author.toString() !== userId) {
-        //   const notif = await Notification.create({
-        //     recipient: post.author,
-        //     sender: userId,
-        //     type: "comment",
-        //     message: `${socket.user.username} commented on your post`,
-        //   });
-        //   io.to(`user:${post.author}`).emit("notification:new", notif);
-        // }
-
         ack?.({ status: "ok", comment });
       } catch (err) {
         console.error("❌ Comment Error:", err.message);
@@ -107,7 +100,7 @@ export function initSocket(server, options = {}) {
       }
     });
 
-    // ✅ Community message
+    // 5. Community message
     socket.on("message:send", async (payload, ack) => {
       try {
         const message = await Message.create({
@@ -125,7 +118,7 @@ export function initSocket(server, options = {}) {
       }
     });
 
-    // ✅ Notification send (for follow, like, etc.)
+    // 6. Notification send
     socket.on("notification:send", async (payload, ack) => {
       try {
         const notif = await Notification.create({
@@ -142,7 +135,7 @@ export function initSocket(server, options = {}) {
       }
     });
 
-    // ✅ Disconnect cleanup
+    // 7. Disconnect cleanup
     socket.on("disconnect", () => {
       const userSockets = onlineUsers.get(userId);
       if (userSockets) {
@@ -155,7 +148,7 @@ export function initSocket(server, options = {}) {
 
   console.log("✅ Socket.IO initialized successfully");
 
-  // ✅ Expose helper for server-side emits (used from controllers)
+  // ✅ Expose helper for server-side emits
   function emitNotification(recipientId, notification) {
     io.to(`user:${recipientId}`).emit("notification:new", notification);
   }
@@ -163,6 +156,7 @@ export function initSocket(server, options = {}) {
   return { io, onlineUsers, emitNotification };
 }
 
+// ✅ Correctly exported getter that reads the global 'io'
 export function getIO() {
   if (!io) {
     throw new Error("Socket.io not initialized!");

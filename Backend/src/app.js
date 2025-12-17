@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
+import { getIO } from "./socket/index.js"; // 👈 CRITICAL: Added this import
 
 dotenv.config();
 
@@ -28,11 +29,13 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+// ✅ Socket Middleware
 app.use((req, res, next) => {
   try {
-    req.io = getIO();
+    req.io = getIO(); // Now this function exists because we imported it!
   } catch (err) {
-    console.error("Socket not initialized yet");
+    // It's normal for IO to not be ready for the very first split second or in tests
+    // console.error("Socket not initialized yet"); 
   }
   next();
 });
