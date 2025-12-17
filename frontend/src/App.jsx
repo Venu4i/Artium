@@ -1,36 +1,19 @@
-import { useState } from 'react'
-import AuthPage from './components/AuthPage'
-import { socket } from './socket/socket'
+// src/App.jsx
+import { Routes, Route } from 'react-router-dom';
+import AuthPage from './components/AuthPage';
 import CommunityPage from './pages/CommunityPage';
+// import { socket } from './socket/socket'; // Keep if you are using it globally
 
 function App() {
-  const [user, setUser] = useState(null); //get from login
-
-  useEffect(() => {
-    // Mock Login for demo
-    const mockUser = { _id: "user123", username: "ArtistOne" };
-    setUser(mockUser);
-
-    // 1. Setup connection
-    socket.emit("setup", mockUser);
-
-    // 2. Global Notification Listener
-    socket.on("notification", (data) => {
-      alert(`🔔 New Notification: ${data.message}`);
-      console.log("Notification Data:", data);
-    });
-
-    return () => {
-      socket.off("notification");
-    };
-  }, []);
-
   return (
-    <>
-    <AuthPage />
-    <CommunityPage />
-    </>
-  )
+    <Routes>
+      {/* Route for Login/Signup */}
+      <Route path="/" element={<AuthPage />} />
+      
+      {/* Route for Community Page */}
+      <Route path="/community" element={<CommunityPage />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
