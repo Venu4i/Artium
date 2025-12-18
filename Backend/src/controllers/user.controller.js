@@ -278,6 +278,18 @@ const editProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Profile updated successfully"));
 });
 
+const searchUsers = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.status(200).json(new ApiResponse(200, [], "Empty query"));
+
+  const users = await User.find({
+    username: { $regex: query, $options: "i" },
+    _id: { $ne: req.user._id }, // Don't show yourself
+  }).select("username profilePicture bio");
+
+  return res.status(200).json(new ApiResponse(200, users, "Users found"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -287,5 +299,6 @@ export {
   generateAccessAndRefreshTokens,
   getUser,
   changePassword,
-  editProfile
+  editProfile,
+  searchUsers
 };
