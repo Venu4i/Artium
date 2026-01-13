@@ -8,6 +8,8 @@ const userModel = new mongoose.Schema(
       type: String,
       trim: true,
       lowercase: true,
+      unique: true, // Ensure username is unique
+      required: true
     },
     email: {
       type: String,
@@ -18,7 +20,7 @@ const userModel = new mongoose.Schema(
     },
     password: {
       type: String,
-      default: null,
+      default: null, // Null for Google Auth users
     },
     googleId: {
       type: String,
@@ -28,10 +30,14 @@ const userModel = new mongoose.Schema(
       type: String,
     },
 
-    // Profile info
+    // 🎨 Profile info (Visuals)
     profilePicture: {
       type: String,
-      default: "",
+      default: "https://res.cloudinary.com/demo/image/upload/v1633535288/sample.jpg", // Default placeholder
+    },
+    coverImage: { // NEW: For the profile banner
+      type: String,
+      default: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
     },
     bio: {
       type: String,
@@ -42,44 +48,37 @@ const userModel = new mongoose.Schema(
       enum: ["male", "female", "other", ""],
       default: "",
     },
+    
+    // 🎨 Professional Info (NEW)
+    skills: [{ // e.g., ["Digital Art", "3D Modeling", "Watercolor"]
+      type: String,
+      trim: true
+    }],
+    socialLinks: { // NEW: For external portfolio/socials
+      instagram: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+      portfolio: { type: String, default: "" }
+    },
 
-    // Interactions
-    likedPosts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Artwork",
-      },
-    ],
-    bookmarkedPosts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Artwork",
-      },
-    ],
+    // 🤝 Social Graph (NEW)
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+    // 🖼️ Content
+    posts: [{ // The artworks this user created
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Artwork" 
+    }],
+    likedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artwork" }],
+    bookmarkedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artwork" }],
 
     // 🔔 Notifications & messages
-    notifications: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Notification",
-      },
-    ],
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-      },
-    ],
+    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notification" }],
+    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Message" }],
 
     // 👀 Socket integration
-    isOnline: {
-      type: Boolean,
-      default: false,
-    },
-    lastSeen: {
-      type: Date,
-      default: Date.now,
-    },
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
@@ -98,7 +97,7 @@ userModel.methods.isPasswordCorrect = async function (password) {
 
 userModel.methods.generateAccessToken = function () {
   return jwt.sign(
-    { _id: this._id, email: this.email },
+    { _id: this._id, email: this.email, username: this.username },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || "15m" }
   );

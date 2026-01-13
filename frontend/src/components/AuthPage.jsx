@@ -53,7 +53,7 @@ export default function AuthPage() {
 
                 // 2. Alert & Navigate
                 alert(`Welcome back! ${response.data.data.user.username}`);
-                navigate("/community"); // ✅ Navigate to Community
+                navigate("/profile"); // ✅ Navigate to Community
 
             } else {
                 // --- SIGNUP LOGIC ---
@@ -69,7 +69,7 @@ export default function AuthPage() {
                 localStorage.setItem("accessToken", response.data.data.accessToken);
                 
                 alert("Account created! Redirecting...");
-                navigate("/community"); // ✅ Navigate to Community
+                navigate("/profile"); // ✅ Navigate to Community
             }
         } catch (error) {
             console.error("Auth Error:", error);
