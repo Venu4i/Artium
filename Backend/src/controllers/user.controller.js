@@ -68,11 +68,33 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!identifier || !password) {
     throw new ApiError(400, "Username or email and password are required");
   }
+  console.log("incoming", identifier , password)
 
+  // 1. Normalize the identifier to lowercase to match the registration format
   const normalizedIdentifier = identifier.trim().toLowerCase();
+
+  // 2. Search using the normalized string
   const user = await User.findOne({
-    $or: [{ username: normalizedIdentifier }, { email: normalizedIdentifier }],
+    $or: [
+      { username: normalizedIdentifier }, 
+      { email: normalizedIdentifier }
+    ],
   });
+
+  if (!user) {
+    // If we still can't find it, let's try a case-insensitive regex search just in case 
+    // some old data wasn't lowercased
+    const regexUser = await User.findOne({
+      $or: [
+        { username: { $regex: new RegExp(`^${identifier.trim()}$`, "i") } },
+        { email: { $regex: new RegExp(`^${identifier.trim()}$`, "i") } }
+      ]
+    });
+
+    if (!regexUser) throw new ApiError(404, "User not found");
+    // Use regexUser if found
+    user = regexUser; 
+  }
 
   if (!user) throw new ApiError(404, "User not found");
 
