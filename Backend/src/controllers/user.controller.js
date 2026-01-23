@@ -132,7 +132,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const googleAuth = asyncHandler(async (req, res) => {
-  const { email, name, googleId, avatar } = req.body;
+  const { email, name, googleId, profilePicture } = req.body;
 
   if (!email || !googleId) {
     throw new ApiError(400, "Google auth data missing");
@@ -145,7 +145,7 @@ const googleAuth = asyncHandler(async (req, res) => {
       username: email.split("@")[0],
       email,
       googleId,
-      profilePicture: avatar,
+      profilePicture: profilePicture,
       password: null
     });
   }
@@ -275,29 +275,48 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+
 const editProfile = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { bio, gender } = req.body;
-  const profilePicture = req.file;
-  let cloudResponse;
-
-  if (profilePicture) {
-    const fileUri = getDataUrl(profilePicture);
-    cloudResponse = await cloudinary.uploader.upload(fileUri);
-  }
+  // 1. Get all text fields
+  const { bio, gender, portfolioLink, instagram, twitter, skills } = req.body;
 
   const user = await User.findById(userId).select("-password");
   if (!user) throw new ApiError(404, "User not found");
 
-  if (bio) user.bio = bio;
-  if (gender) user.gender = gender;
-  if (profilePicture) user.profilePicture = cloudResponse.secure_url;
+  // 2. Handle Images (Check req.files instead of req.file)
+  // Save 'avatar' upload to 'profilePicture' field in DB
+  if (req.files && req.files['avatar'] && req.files['avatar'][0]) {
+      user.profilePicture = req.files['avatar'][0].path;
+  }
+
+  // Save 'coverImage' upload to 'coverImage' field in DB
+  if (req.files && req.files['coverImage'] && req.files['coverImage'][0]) {
+      user.coverImage = req.files['coverImage'][0].path;
+  }
+
+  // 3. Update Text Fields
+  if (bio !== undefined) user.bio = bio;
+  if (gender !== undefined) user.gender = gender;
+
+  // 4. Update Social Links
+  if (!user.socialLinks) user.socialLinks = { instagram: "", twitter: "", portfolio: "" };
+  if (instagram !== undefined) user.socialLinks.instagram = instagram;
+  if (twitter !== undefined) user.socialLinks.twitter = twitter;
+  if (portfolioLink !== undefined) user.socialLinks.portfolio = portfolioLink;
+
+  // 5. Update Skills
+  if (skills !== undefined) {
+      if (typeof skills === 'string') {
+          user.skills = skills.split(',').map(s => s.trim()).filter(s => s !== "");
+      }
+  }
 
   await user.save();
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Profile updated successfully"));
+      .status(200)
+      .json(new ApiResponse(200, user, "Profile updated successfully"));
 });
 
 const searchUsers = asyncHandler(async (req, res) => {
@@ -312,7 +331,21 @@ const searchUsers = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, users, "Users found"));
 });
 
+const getUserProfile = asyncHandler(async (req, res) => {
+  // req.user comes from verifyJWT middleware
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User profile fetched successfully"));
+});
+
 export {
+  getUserProfile,
   registerUser,
   loginUser,
   googleAuth,

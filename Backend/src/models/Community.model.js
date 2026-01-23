@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 const communitySchema = new mongoose.Schema(
     {
     name: { type: String, required: true },
-    description: String,
+    description: { type: String },
 
     // Admin who created the community
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
     // List of members
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isPrivate: { type: Boolean, default: false },
 
     // Invitation records
     invites: [

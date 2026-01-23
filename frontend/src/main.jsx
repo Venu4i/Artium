@@ -5,6 +5,7 @@ import { store } from './store/index.js' // adjust path to your store
 import { injectStore } from './api/axios'
 import './index.css'
 import App from './App.jsx'
+import { BrowserRouter } from 'react-router-dom' // Import this
 
 injectStore(store); // Link store to axios
 
