@@ -16,7 +16,7 @@ function App() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await api.post("/user/refresh");
+        const response = await api.get("/user/refresh");
         const { user, accessToken } = response.data.data;
 
         dispatch(setCredentials({ user, token: accessToken }));
