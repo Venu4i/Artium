@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import EditProfileModal from '../components/EditProfileModal';
 import { MapPinIcon, LinkIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
@@ -24,11 +24,8 @@ const ProfilePage = () => {
 
         // 2. DEBUG: Ensure URL matches your Backend Port (8000 vs 5000)
         // My previous backend code used port 8000 and /api/users
-        const response = await axios.get("http://localhost:5000/api/v1/user/profile", {
-          headers: {
-            Authorization: `Bearer ${token}` // Must look like "Bearer eyJhbGci..."
-          }
-        });
+        const response = await api.get("/user/profile");
+
 
         console.log("✅ Profile Data:", response.data);
         setUser(response.data.data);

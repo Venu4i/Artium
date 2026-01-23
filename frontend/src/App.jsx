@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { setCredentials, logout, setCheckingAuth } from "./store/authSlice";
 import api from "./api/axios";
-import AuthPage from "./components/AuthPage";
+import AuthPage from "./components/AuthPage"
 import Dashboard from "./pages/Dashboard";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   const { isAuthenticated, isCheckingAuth } = useSelector(
@@ -14,13 +16,11 @@ function App() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // On refresh, we ask the server for a new token using the Refresh Cookie
-        const response = await api.post("/user/refresh-token");
+        const response = await api.post("/user/refresh");
         const { user, accessToken } = response.data.data;
-        
+
         dispatch(setCredentials({ user, token: accessToken }));
       } catch (error) {
-        // If refresh fails (no cookie/invalid), we are officially logged out
         dispatch(logout());
       } finally {
         dispatch(setCheckingAuth(false));
@@ -38,7 +38,43 @@ function App() {
     );
   }
 
-  return isAuthenticated ? <Dashboard /> : <AuthPage />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Auth Page */}
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <AuthPage />
+          }
+        />
+
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
+          }
+        />
+
+        {/* Profile Page */}
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />
+          }
+        />
+
+        {/* Default */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

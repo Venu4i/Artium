@@ -42,16 +42,16 @@ app.use((req, res, next) => {
 
 // ✅ Routes
 import userRouter from "./routes/user.routes.js";
-import messageRouter from "./routes/message.routes.js";
-import commentRouter from "./routes/comment.routes.js";
-import notificationRouter from "./routes/notification.routes.js";
-import communityRouter from "./routes/community.routes.js";
+// import messageRouter from "./routes/message.routes.js";
+// import commentRouter from "./routes/comment.routes.js";
+// import notificationRouter from "./routes/notification.routes.js";
+// import communityRouter from "./routes/community.routes.js";
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/messages", messageRouter);
-app.use("/api/v1/comments", commentRouter);
-app.use("/api/v1/notifications", notificationRouter);
-app.use("/api/v1/community", communityRouter);
+// app.use("/api/v1/messages", messageRouter);
+// app.use("/api/v1/comments", commentRouter);
+// app.use("/api/v1/notifications", notificationRouter);
+// app.use("/api/v1/community", communityRouter);
 
 // ✅ Global error handler
 app.use((err, _, res, next) => {

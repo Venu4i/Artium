@@ -2,7 +2,7 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CameraIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'; // Import PhotoIcon
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../api/axios';
 
 const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
     const [formData, setFormData] = useState({
@@ -50,25 +50,23 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
+    
         const data = new FormData();
         data.append('bio', formData.bio);
         data.append('instagram', formData.instagram);
         data.append('twitter', formData.twitter);
         data.append('portfolioLink', formData.portfolioLink);
         data.append('skills', formData.skills);
-
+    
         // Append Images if selected
         if (avatarFile) data.append('avatar', avatarFile);
         if (coverFile) data.append('coverImage', coverFile);
-
+    
         try {
-            const token = localStorage.getItem("accessToken");
-            // Ensure port matches your backend (5000 or 8000)
-            const res = await axios.patch('http://localhost:5000/api/v1/user/edit', data, {
+            // Using your axios instance
+            const res = await api.patch('/user/edit', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`
                 },
             });
             setUser(res.data.data);
@@ -80,6 +78,7 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
             setLoading(false);
         }
     };
+    
 
     return (
         <Transition appear show={isOpen} as={Fragment}>

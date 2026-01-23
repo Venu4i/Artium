@@ -1,13 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LayoutGrid, Users, Heart, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const artworks = [
   { id: 1, title: "Neon Dreams", artist: "Aura.Art", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000" },
   { id: 2, title: "Vortex", artist: "Cipher", url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000" },
 ];
 
+
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-zinc-950 text-slate-100 p-6">
       {/* Navigation - Glassmorphism */}
@@ -18,7 +22,11 @@ export default function Dashboard() {
         <div className="flex gap-6">
           <Search className="text-slate-400 hover:text-cyan-400 cursor-pointer transition" />
           <LayoutGrid className="text-violet-500" />
+          <button onClick={() => navigate("/profile")}
+            className='cursor-pointer'>
           <Users className="text-slate-400" />
+          </button>
+          
         </div>
       </nav>
 
