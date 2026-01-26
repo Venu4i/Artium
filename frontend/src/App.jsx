@@ -9,6 +9,7 @@ import AuthPage from "./components/AuthPage";
 import MainLayout from "./layout/MainLayout";
 import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
+import UploadPage from "./pages/UploadPage";
 
 // Protected Route Wrapper
 const ProtectedLayout = () => {
@@ -78,8 +79,7 @@ function App() {
           {/* User Profile */}
           <Route path="/profile" element={<ProfilePage />} />
           
-          {/* Add future routes here, e.g.: */}
-          {/* <Route path="/upload" element={<UploadPage />} /> */}
+          <Route path="/upload" element={<UploadPage />} />
           {/* <Route path="/settings" element={<SettingsPage />} /> */}
         </Route>
 

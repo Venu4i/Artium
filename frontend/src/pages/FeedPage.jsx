@@ -35,12 +35,15 @@ const FeedPage = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto">
+        // RESPONSIVE: Added px-4 sm:px-6 lg:px-8 for horizontal breathing room
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <HeroBanner username={currentUser?.username} />
 
             {/* Bigger Grid: columns-xs or columns-sm */}
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6 pb-20">
+            {/* RESPONSIVE: columns-1 on mobile, 2 on sm, 3 on lg, 4 on xl */}
+            {/* RESPONSIVE: gap-4 on mobile, gap-6 on desktop */}
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 md:gap-6 space-y-4 md:space-y-6 pb-20">
                 {loading ? (
                     <div className="text-slate-500 text-center py-20 col-span-full">Loading inspiration...</div>
                 ) : (
