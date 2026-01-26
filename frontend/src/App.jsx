@@ -6,6 +6,7 @@ import api from "./api/axios";
 import AuthPage from "./components/AuthPage"
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
+import FeedPage from "./pages/FeedPage";
 
 function App() {
   const { isAuthenticated, isCheckingAuth } = useSelector(
@@ -72,6 +73,7 @@ function App() {
             isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
           }
         />
+        <Route path="/feed" element={<FeedPage />} />
       </Routes>
     </BrowserRouter>
   );

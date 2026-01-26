@@ -33,11 +33,11 @@ const ProfilePage = () => {
         console.error("❌ Fetch Error:", err);
         // Handle 401 specifically
         if (err.response && err.response.status === 401) {
-             setError("Session expired. Please log in again.");
-             // Optional: Redirect to login
-             // window.location.href = "/login";
+          setError("Session expired. Please log in again.");
+          // Optional: Redirect to login
+          // window.location.href = "/login";
         } else {
-             setError(err.message || "Could not load profile.");
+          setError(err.message || "Could not load profile.");
         }
       } finally {
         setLoading(false);
@@ -52,44 +52,44 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
-      
+
       {/* 1. HEADER / COVER IMAGE */}
       <div className="relative h-64 w-full bg-slate-900 overflow-hidden group">
-        <img 
-          src={user?.coverImage || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"} 
-          alt="Cover" 
+        <img
+          src={user?.coverImage || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"}
+          alt="Cover"
           className="w-full h-full object-cover opacity-80"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative -mt-20">
-        
+
         {/* 2. PROFILE INFO CARD */}
         <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-6 pb-6 border-b border-white/10">
-          
+
           <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            
+
             {/* AVATAR */}
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-slate-950 ring-4 ring-violet-500/30"
             >
-              <img 
+              <img
                 src={user?.profilePicture || `https://ui-avatars.com/api/?name=${user?.username}&background=0D8ABC&color=fff`}
-                alt={user?.username} 
-                className="w-full h-full rounded-full object-cover border-4 border-slate-950" 
+                alt={user?.username}
+                className="w-full h-full rounded-full object-cover border-4 border-slate-950"
               />
             </motion.div>
 
             {/* TEXT DETAILS */}
             <div className="text-center md:text-left mb-2">
               <h1 className="text-3xl font-bold text-white capitalize">{user?.username || "Artist"}</h1>
-              
+
               <div className="flex items-center gap-4 mt-2 justify-center md:justify-start text-sm text-slate-400">
-                 <span><strong className="text-white">{user?.followers?.length || 0}</strong> Followers</span>
-                 <span><strong className="text-white">{user?.following?.length || 0}</strong> Following</span>
+                <span><strong className="text-white">{user?.followers?.length || 0}</strong> Followers</span>
+                <span><strong className="text-white">{user?.following?.length || 0}</strong> Following</span>
               </div>
 
               {/* Skills */}
@@ -107,7 +107,7 @@ const ProfilePage = () => {
 
           {/* ACTION BUTTONS */}
           <div className="flex gap-3 mb-4 md:mb-0">
-             <motion.button
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsModalOpen(true)}
@@ -120,22 +120,22 @@ const ProfilePage = () => {
 
         {/* 3. BIO & SOCIALS */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-           <div className="md:col-span-2">
-              <h3 className="text-lg font-semibold text-white mb-2">About</h3>
-              <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {user?.bio || "No bio added yet."}
-              </p>
-           </div>
-           
-           <div className="flex flex-col gap-3">
-              {user?.socialLinks?.portfolio && (
-                <a href={user.socialLinks.portfolio} target="_blank" rel="noopener noreferrer" 
-                   className="flex items-center gap-3 p-3 rounded-lg bg-slate-900/50 border border-white/5 hover:border-violet-500/50 transition-colors group">
-                   <LinkIcon className="w-5 h-5 text-violet-400" />
-                   <span className="text-sm text-slate-300">Portfolio Website</span>
-                </a>
-              )}
-           </div>
+          <div className="md:col-span-2">
+            <h3 className="text-lg font-semibold text-white mb-2">About</h3>
+            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
+              {user?.bio || "No bio added yet."}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {user?.socialLinks?.portfolio && (
+              <a href={user.socialLinks.portfolio} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 rounded-lg bg-slate-900/50 border border-white/5 hover:border-violet-500/50 transition-colors group">
+                <LinkIcon className="w-5 h-5 text-violet-400" />
+                <span className="text-sm text-slate-300">Portfolio Website</span>
+              </a>
+            )}
+          </div>
         </div>
 
         {/* 4. TABS */}
@@ -144,15 +144,14 @@ const ProfilePage = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-sm font-medium transition-all relative capitalize ${
-                activeTab === tab ? 'text-violet-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
+              className={`pb-4 text-sm font-medium transition-all relative capitalize ${activeTab === tab ? 'text-violet-400' : 'text-slate-500 hover:text-slate-300'
+                }`}
             >
               {tab === 'posts' ? 'Artworks' : tab}
               {activeTab === tab && (
-                <motion.div 
+                <motion.div
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]" 
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.5)]"
                 />
               )}
             </button>
@@ -161,17 +160,17 @@ const ProfilePage = () => {
 
         {/* 5. GRID CONTENT */}
         <div className="py-10">
-           <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
-              <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
-              <p>No artworks yet.</p>
-           </div>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
+            <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
+            <p>No artworks yet.</p>
+          </div>
         </div>
 
       </div>
 
-      <EditProfileModal 
-        isOpen={isModalOpen} 
-        closeModal={() => setIsModalOpen(false)} 
+      <EditProfileModal
+        isOpen={isModalOpen}
+        closeModal={() => setIsModalOpen(false)}
         user={user}
         setUser={setUser}
       />
