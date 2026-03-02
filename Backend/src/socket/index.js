@@ -1,47 +1,22 @@
-// src/socket/index.js
-import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
-//import {Notification} from "../models/Notification.model.js";
-import Message from "../models/Message.model.js";
-import Comment from "../models/Comment.model.js";
+import User from "../models/User.model.js";
 
-// 🔴 CRITICAL FIX: Declare 'io' globally in this module so getIO can access it
-let io;
+const socketAuth = async (socket, next) => {
+  try {
+    console.log("🔎 Handshake auth:", socket.handshake.auth);
 
-/**
- * Initializes socket.io server
- * Called from src/server.js
- */
-export function initSocket(server, options = {}) {
-  // 🔴 FIX: remove 'const' so we update the global 'io' variable
-  io = new Server(server, {
-    cors: {
-      origin: options.corsOrigin || "http://localhost:5173",
-      credentials: true,
-    },
-  });
+    const token = socket.handshake.auth.token;
+    if (!token) return next(new Error("No token"));
+    console.log("🔎 Token received:", token);
 
-  // Map userId -> Set of socketIds
-  const onlineUsers = new Map();
 
-  // ✅ Middleware: authenticate socket connection
-  io.use((socket, next) => {
-    try {
-      const token =
-        socket.handshake.auth?.token ||
-        socket.handshake.headers["authorization"]?.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decoded._id).select("_id username");
+    console.log("🔎 User found:", user?._id);
 
-      if (!token) return next(new Error("No token provided"));
+    if (!user) return next(new Error("User not found"));
 
-      const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      socket.user = { _id: payload._id, username: payload.username };
-      next();
-    } catch (err) {
-      console.error("❌ Socket Auth Error:", err.message);
-      next(new Error("Authentication failed"));
-    }
-  });
-
+<<<<<<< HEAD
   // ✅ When connected
   io.on("connection", (socket) => {
     const userId = String(socket.user._id);
@@ -151,8 +126,16 @@ export function initSocket(server, options = {}) {
   // ✅ Expose helper for server-side emits
   function emitNotification(recipientId, notification) {
     io.to(`user:${recipientId}`).emit("notification:new", notification);
+=======
+    socket.user = user;
+    next();
+  } catch {
+    next(new Error("Unauthorized"));
+>>>>>>> 2d8aba2 (feat  : "socket prsnl chats")
   }
+};
 
+<<<<<<< HEAD
   return { io, onlineUsers, emitNotification };
 }
 
@@ -163,3 +146,6 @@ export function getIO() {
   }
   return io;
 }
+=======
+export default socketAuth;
+>>>>>>> 2d8aba2 (feat  : "socket prsnl chats")
