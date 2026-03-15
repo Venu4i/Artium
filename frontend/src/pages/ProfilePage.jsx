@@ -1,50 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import EditProfileModal from '../components/EditProfileModal';
-import { MapPinIcon, LinkIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
+import { LinkIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import FeedCard from '../components/dashboard/FeedCard';
+import ArtworkModal from '../components/dashboard/ArtworkModal';
+import { useOutletContext } from 'react-router-dom';
 
 const ProfilePage = () => {
+  const { currentUser, refreshUser } = useOutletContext();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
+  const [postsArtworks, setPostsArtworks] = useState([]);
+  const [likedArtworks, setLikedArtworks] = useState([]);
+  const [tabLoading, setTabLoading] = useState(false);
+  const [selectedArtwork, setSelectedArtwork] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        // 1. DEBUG: Check if token exists
-        const token = localStorage.getItem("accessToken");
-        console.log("🔑 Debug Token:", token); // check console!
-
-        if (!token) {
-          throw new Error("No login token found. Please log in again.");
-        }
-
-        // 2. DEBUG: Ensure URL matches your Backend Port (8000 vs 5000)
-        // My previous backend code used port 8000 and /api/users
-        const response = await api.get("/user/profile");
-
-        console.log("✅ Profile Data:", response.data);
+        const response = await api.get('/user/profile');
         setUser(response.data.data);
       } catch (err) {
-        console.error("❌ Fetch Error:", err);
-        // Handle 401 specifically
-        if (err.response && err.response.status === 401) {
-          setError("Session expired. Please log in again.");
-          // Optional: Redirect to login
-          // window.location.href = "/login";
+        console.error('Fetch Error:', err);
+        if (err.response?.status === 401) {
+          setError('Session expired. Please log in again.');
         } else {
-          setError(err.message || "Could not load profile.");
+          setError(err.message || 'Could not load profile.');
         }
       } finally {
         setLoading(false);
       }
     };
-
     fetchUserProfile();
   }, []);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    if (activeTab === 'posts') {
+      setTabLoading(true);
+      api.get(`/artworks/by-owner/${user._id}`)
+        .then((res) => setPostsArtworks(res.data.data || []))
+        .catch(() => setPostsArtworks([]))
+        .finally(() => setTabLoading(false));
+    } else if (activeTab === 'liked') {
+      setTabLoading(true);
+      api.get('/artworks/my-likes')
+        .then((res) => setLikedArtworks(res.data.data || []))
+        .catch(() => setLikedArtworks([]))
+        .finally(() => setTabLoading(false));
+    }
+  }, [user?._id, activeTab]);
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>;
   if (error) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-red-500">{error}</div>;
@@ -163,10 +173,91 @@ const ProfilePage = () => {
 
         {/* 5. GRID CONTENT */}
         <div className="py-10">
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
-            <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
-            <p>No artworks yet.</p>
-          </div>
+          {tabLoading ? (
+            <div className="text-slate-500 text-center py-20">Loading...</div>
+          ) : activeTab === 'posts' ? (
+            postsArtworks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
+                <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
+                <p>No artworks yet.</p>
+              </div>
+            ) : (
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-6 space-y-4 md:space-y-6">
+                {postsArtworks.map((art, i) => (
+                  <FeedCard
+                    key={art._id}
+                    artwork={art}
+                    index={i}
+                    onClick={async (a) => {
+                      setSelectedArtwork(a);
+                      setModalOpen(true);
+                      try {
+                        const res = await api.get(`/artworks/${a._id}`);
+                        if (res.data?.data) setSelectedArtwork(res.data.data);
+                      } catch (e) { console.error(e); }
+                    }}
+                    onLike={async (a) => {
+                      try {
+                        const res = await api.post(`/artworks/${a._id}/like`);
+                        const updated = res.data?.data?.artwork;
+                        if (updated) {
+                          setPostsArtworks((prev) => prev.map((x) => (x._id === updated._id ? { ...x, ...updated } : x)));
+                          if (selectedArtwork?._id === updated._id) setSelectedArtwork((p) => (p ? { ...p, ...updated } : p));
+                        }
+                        refreshUser?.();
+                      } catch (e) { console.error(e); }
+                    }}
+                    disabledLike={false}
+                  />
+                ))}
+              </div>
+            )
+          ) : activeTab === 'liked' ? (
+            likedArtworks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
+                <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
+                <p>No liked artworks yet.</p>
+              </div>
+            ) : (
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-6 space-y-4 md:space-y-6">
+                {likedArtworks.map((art, i) => (
+                  <FeedCard
+                    key={art._id}
+                    artwork={art}
+                    index={i}
+                    onClick={async (a) => {
+                      setSelectedArtwork(a);
+                      setModalOpen(true);
+                      try {
+                        const res = await api.get(`/artworks/${a._id}`);
+                        if (res.data?.data) setSelectedArtwork(res.data.data);
+                      } catch (e) { console.error(e); }
+                    }}
+                    onLike={async (a) => {
+                      try {
+                        const res = await api.post(`/artworks/${a._id}/like`);
+                        const updated = res.data?.data?.artwork;
+                        if (updated && !updated.likedByMe) {
+                          setLikedArtworks((prev) => prev.filter((x) => x._id !== a._id));
+                          if (selectedArtwork?._id === a._id) setModalOpen(false);
+                        } else if (updated) {
+                          setLikedArtworks((prev) => prev.map((x) => (x._id === updated._id ? { ...x, ...updated } : x)));
+                          if (selectedArtwork?._id === updated._id) setSelectedArtwork((p) => (p ? { ...p, ...updated } : p));
+                        }
+                        refreshUser?.();
+                      } catch (e) { console.error(e); }
+                    }}
+                    disabledLike={false}
+                  />
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
+              <PaintBrushIcon className="w-12 h-12 mb-4 opacity-50" />
+              <p>Bookmarked coming soon.</p>
+            </div>
+          )}
         </div>
 
       </div>
@@ -176,6 +267,23 @@ const ProfilePage = () => {
         closeModal={() => setIsModalOpen(false)}
         user={user}
         setUser={setUser}
+      />
+
+      <ArtworkModal
+        isOpen={modalOpen}
+        closeModal={() => setModalOpen(false)}
+        artwork={selectedArtwork}
+        currentUser={currentUser}
+        onArtworkUpdate={(updated) => {
+          if (!updated) return;
+          setPostsArtworks((prev) => prev.map((x) => (x._id === updated._id ? { ...x, ...updated } : x)));
+          setLikedArtworks((prev) => {
+            if (updated.likedByMe) return prev.map((x) => (x._id === updated._id ? { ...x, ...updated } : x));
+            return prev.filter((x) => x._id !== updated._id);
+          });
+          setSelectedArtwork((p) => (p && p._id === updated._id ? { ...p, ...updated } : p));
+        }}
+        onFollowSuccess={refreshUser}
       />
     </div>
   );

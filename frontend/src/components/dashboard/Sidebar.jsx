@@ -76,16 +76,19 @@ const NavContent = ({ user, closeMobileMenu }) => (
                     <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-500">Followers</span>
-                            <span className="text-white font-bold">{user?.followers?.length || 0}</span>
+                            <span className="text-white font-bold">{user?.followers?.length ?? 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-500">Following</span>
+                            <span className="text-white font-bold">{user?.following?.length ?? 0}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-500">Artworks</span>
-                            <span className="text-white font-bold">{user?.posts?.length || 0}</span>
+                            <span className="text-white font-bold">{user?.posts?.length ?? 0}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-500">Likes</span>
-                            {/* calculate total likes */}
-                            <span className="text-violet-400 font-bold">0</span>
+                            <span className="text-violet-400 font-bold">{user?.likedPosts?.length ?? 0}</span>
                         </div>
                     </div>
                 </div>

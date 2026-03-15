@@ -30,21 +30,19 @@ function App() {
   );
   const dispatch = useDispatch();
 
-  // 1. Check Auth on Load (RefreshToken)
+  // On load: verify session using refresh cookie only (no Redux/localStorage tokens).
   useEffect(() => {
     const initAuth = async () => {
       try {
         const response = await api.get("/user/refresh");
-        const { user, accessToken } = response.data.data;
-        dispatch(setCredentials({ user, token: accessToken }));
-      } catch (error) {
-        // Only logout if it's a genuine auth error, not just network
+        const { user } = response.data?.data ?? {};
+        if (user) dispatch(setCredentials({ user }));
+      } catch {
         dispatch(logout());
       } finally {
         dispatch(setCheckingAuth(false));
       }
     };
-
     initAuth();
   }, [dispatch]);
 

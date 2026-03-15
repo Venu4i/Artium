@@ -8,7 +8,8 @@ import {
   getUser,
   changePassword,
   editProfile,
-  getUserProfile // 👈 Import the new function
+  getUserProfile,
+  toggleFollowUser,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -20,9 +21,11 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", verifyJWT, logoutUser);
 router.get("/refresh", refreshAccessToken);
+router.post("/refresh", refreshAccessToken); // frontend sends refreshToken in body
 router.post("/google", googleAuth);
 
-router.get("/profile", verifyJWT, getUserProfile); 
+router.get("/profile", verifyJWT, getUserProfile);
+router.post("/:userId/follow", verifyJWT, toggleFollowUser);
 router.get("/me/:id", getUser);
 router.patch("/change-password", verifyJWT, changePassword);
 router.patch("/edit", verifyJWT, upload.fields([

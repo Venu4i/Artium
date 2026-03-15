@@ -218,6 +218,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshTokens(user._id);
 
+    const loggedInUser = await User.findById(user._id).select(
+      "-password -refreshToken"
+    );
+
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -231,7 +235,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .json(
         new ApiResponse(
           200,
-          { accessToken, refreshToken: newRefreshToken },
+          {
+            user: loggedInUser,
+            accessToken,
+            refreshToken: newRefreshToken,
+          },
           "Access token refreshed"
         )
       );
@@ -332,16 +340,61 @@ const searchUsers = asyncHandler(async (req, res) => {
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {
-  // req.user comes from verifyJWT middleware
   const user = await User.findById(req.user._id).select("-password");
-
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
+  if (!user) throw new ApiError(404, "User not found");
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User profile fetched successfully"));
+});
+
+// Toggle follow / unfollow another user
+const toggleFollowUser = asyncHandler(async (req, res) => {
+  const currentUserId = req.user._id;
+  const targetUserId = req.params.userId;
+
+  if (targetUserId === currentUserId.toString()) {
+    throw new ApiError(400, "You cannot follow yourself");
+  }
+
+  const targetUser = await User.findById(targetUserId);
+  if (!targetUser) throw new ApiError(404, "User not found");
+
+  const currentUser = await User.findById(currentUserId);
+  const isFollowing = currentUser.following.some(
+    (id) => id.toString() === targetUserId
+  );
+
+  if (isFollowing) {
+    await User.findByIdAndUpdate(currentUserId, {
+      $pull: { following: targetUserId },
+    });
+    await User.findByIdAndUpdate(targetUserId, {
+      $pull: { followers: currentUserId },
+    });
+  } else {
+    await User.findByIdAndUpdate(currentUserId, {
+      $push: { following: targetUserId },
+    });
+    await User.findByIdAndUpdate(targetUserId, {
+      $push: { followers: currentUserId },
+    });
+  }
+
+  const updatedCurrent = await User.findById(currentUserId)
+    .select("following followers")
+    .lean();
+  const updatedTarget = await User.findById(targetUserId)
+    .select("followers following")
+    .lean();
+  return res.status(200).json(
+    new ApiResponse(200, {
+      following: !isFollowing,
+      myFollowingCount: updatedCurrent.following.length,
+      myFollowersCount: updatedCurrent.followers.length,
+      targetFollowersCount: updatedTarget.followers.length,
+      targetFollowingCount: updatedTarget.following.length,
+    }, "Follow toggled")
+  );
 });
 
 export {
@@ -355,5 +408,6 @@ export {
   getUser,
   changePassword,
   editProfile,
-  searchUsers
+  searchUsers,
+  toggleFollowUser,
 };

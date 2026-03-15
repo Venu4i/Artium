@@ -50,10 +50,10 @@ export default function AuthPage() {
         };
 
       const response = await api.post(endpoint, payload);
-      const { user, accessToken } = response.data.data;
+      const { user } = response.data.data;
 
-      // Update Redux state. No LocalStorage needed.
-      dispatch(setCredentials({ user, token: accessToken }));
+      // Tokens are in httpOnly cookies; Redux only holds user for UI.
+      dispatch(setCredentials({ user }));
     } catch (error) {
       alert(error.response?.data?.message || "Authentication failed");
     } finally {

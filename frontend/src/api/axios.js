@@ -12,14 +12,9 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// No request interceptor: auth uses cookies only (sent automatically with withCredentials: true).
 api.interceptors.request.use(
-  (config) => {
-    const token = store?.getState()?.auth?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
+  (config) => config,
   (error) => Promise.reject(error)
 );
 
@@ -28,33 +23,37 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Trigger refresh if 401 occurs and it's not a login/logout request
     if (
-      error.response?.status === 401 && 
-      !originalRequest._retry && 
-      !originalRequest.url.includes("/login")
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/user/login") &&
+      !originalRequest.url.includes("/user/register") &&
+      !originalRequest.url.includes("/user/refresh")
     ) {
       originalRequest._retry = true;
 
       try {
+        // Refresh using cookies only (no body, no Redux token).
         const response = await axios.get(
           "http://localhost:5000/api/v1/user/refresh",
           { withCredentials: true }
         );
 
-        const { accessToken, user } = response.data.data;
+        const { user } = response.data?.data ?? {};
+        const currentUser = store?.getState()?.auth?.user;
 
-        // Only update Redux store
-        store.dispatch(setCredentials({ user, token: accessToken }));
+        store.dispatch(
+          setCredentials({ user: user ?? currentUser })
+        );
 
-        // Retry the original request with new token
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        // Retry: cookies (including new accessToken) are sent automatically.
         return api(originalRequest);
       } catch (refreshError) {
         store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );

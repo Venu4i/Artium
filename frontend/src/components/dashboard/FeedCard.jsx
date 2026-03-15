@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { HeartIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 
-const FeedCard = ({ artwork, index, onClick }) => {
+const FeedCard = ({ artwork, index, onClick, onLike, disabledLike }) => {
+    const liked = artwork.likedByMe === true;
+    const likeCount = Array.isArray(artwork.likes) ? artwork.likes.length : 0;
+
+    const handleHeartClick = (e) => {
+        e.stopPropagation();
+        if (onLike && !disabledLike) onLike(artwork);
+    };
+
     return (
         <motion.div
             layout
@@ -11,10 +20,8 @@ const FeedCard = ({ artwork, index, onClick }) => {
             transition={{ delay: index * 0.05 }}
             whileHover={{ y: -5 }}
             onClick={() => onClick(artwork)}
-            // RESPONSIVE: Reduced mb-8 to mb-4 on mobile
             className="group relative break-inside-avoid mb-4 md:mb-8 rounded-xl overflow-hidden bg-slate-900 border border-white/5 shadow-lg cursor-pointer"
         >
-            {/* 1. Bigger, Clearer Image */}
             <img
                 src={artwork.image}
                 alt={artwork.title}
@@ -22,16 +29,12 @@ const FeedCard = ({ artwork, index, onClick }) => {
                 loading="lazy"
             />
 
-            {/* 2. Overlay - Only visible on hover (or focus on mobile) */}
-            {/* RESPONSIVE: Reduced padding p-5 to p-3 on mobile. Added focus-within for touch devices. */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 md:p-5">
 
                 <div className="flex justify-between items-end">
-                    <div className="min-w-0"> {/* min-w-0 helps truncate work in flex containers */}
-                        {/* RESPONSIVE: text-base on mobile, text-lg on desktop */}
+                    <div className="min-w-0">
                         <h3 className="text-white font-bold text-base md:text-lg truncate pr-2">{artwork.title}</h3>
                         <div className="flex items-center gap-2 mt-1">
-                            {/* RESPONSIVE: Smaller avatar on mobile */}
                             <img
                                 src={artwork.owner?.profilePicture}
                                 className="w-4 h-4 md:w-5 md:h-5 rounded-full"
@@ -41,13 +44,26 @@ const FeedCard = ({ artwork, index, onClick }) => {
                         </div>
                     </div>
 
-                    {/* Quick Stats */}
-                    <div className="flex gap-3 flex-shrink-0">
-                        <div className="flex items-center gap-1 text-white">
-                            {/* RESPONSIVE: Smaller icon on mobile */}
-                            <HeartIcon className="w-3 h-3 md:w-4 md:h-4 text-pink-500" />
-                            <span className="text-xs font-bold">{artwork.likes?.length || 0}</span>
-                        </div>
+                    <div className="flex gap-3 flex-shrink-0" onClick={handleHeartClick}>
+                        <motion.button
+                            type="button"
+                            className="flex items-center gap-1 text-white focus:outline-none"
+                            whileTap={{ scale: 0.85 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                        >
+                            {liked ? (
+                                <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                                >
+                                    <HeartSolid className="w-4 h-4 md:w-5 md:h-5 text-pink-500" />
+                                </motion.span>
+                            ) : (
+                                <HeartOutline className="w-4 h-4 md:w-5 md:h-5 text-white/90" />
+                            )}
+                            <span className="text-xs font-bold">{likeCount}</span>
+                        </motion.button>
                     </div>
                 </div>
 

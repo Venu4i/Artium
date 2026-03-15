@@ -1,134 +1,266 @@
-import React, { Fragment } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon, HeartIcon, ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/outline';
+import {
+  XMarkIcon,
+  HeartIcon,
+  ChatBubbleLeftIcon,
+  ShareIcon,
+} from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
+import { motion } from 'framer-motion';
+import api from '../../api/axios';
 
-const ArtworkModal = ({ isOpen, closeModal, artwork }) => {
-    if (!artwork) return null;
+const ArtworkModal = ({
+  isOpen,
+  closeModal,
+  artwork,
+  currentUser,
+  onArtworkUpdate,
+  onFollowSuccess,
+}) => {
+  const [commentText, setCommentText] = useState('');
+  const [liking, setLiking] = useState(false);
+  const [commenting, setCommenting] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const commentsEndRef = useRef(null);
 
-    return (
-        <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={closeModal}>
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" />
-                </Transition.Child>
+  if (!artwork) return null;
 
-                <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-2 md:p-4">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
-                        >
-                            {/* RESPONSIVE: h-[85vh] or h-[90vh] on mobile to fit nicely */}
-                            <Dialog.Panel className="w-full max-w-5xl h-[90vh] md:h-[85vh] transform overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl flex flex-col md:flex-row">
+  const liked = artwork.likedByMe === true;
+  const likeCount = Array.isArray(artwork.likes) ? artwork.likes.length : 0;
+  const comments = artwork.comments || [];
+  const ownerId = artwork.owner?._id || artwork.owner;
+  const isOwner = currentUser?._id === ownerId;
+  const isFollowingOwner =
+    currentUser?.following?.some((id) => id.toString() === (ownerId || '').toString()) ?? false;
 
-                                {/* LEFT/TOP: Full Image */}
-                                {/* RESPONSIVE: Fixed height on mobile (40%), full height on desktop */}
-                                <div className="w-full md:w-2/3 h-[40%] md:h-full bg-black flex items-center justify-center relative">
-                                    <img
-                                        src={artwork.image}
-                                        alt={artwork.title}
-                                        className="max-h-full max-w-full object-contain"
-                                    />
-                                    <button onClick={closeModal} className="absolute top-4 left-4 p-2 bg-black/50 rounded-full text-white hover:bg-white/20 md:hidden z-10">
-                                        <XMarkIcon className="w-6 h-6" />
-                                    </button>
-                                </div>
+  const scrollCommentsToBottom = () => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-                                {/* RIGHT/BOTTOM: Details Panel */}
-                                {/* RESPONSIVE: Remaining height on mobile (60%), full height on desktop */}
-                                <div className="w-full md:w-1/3 h-[60%] md:h-full bg-slate-900 border-t md:border-t-0 md:border-l border-white/5 flex flex-col">
+  useEffect(() => {
+    if (isOpen && comments.length) scrollCommentsToBottom();
+  }, [isOpen, comments.length]);
 
-                                    {/* Header: User & Close */}
-                                    {/* RESPONSIVE: p-4 on mobile, p-6 on desktop */}
-                                    <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between flex-shrink-0">
-                                        <div className="flex items-center gap-3">
-                                            <img
-                                                src={artwork.owner?.profilePicture || "https://via.placeholder.com/40"}
-                                                alt="Avatar"
-                                                className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/10"
-                                            />
-                                            <div>
-                                                <h3 className="text-sm font-bold text-white">{artwork.owner?.username}</h3>
-                                                <button className="text-xs text-violet-400 font-medium hover:text-violet-300">Follow</button>
-                                            </div>
-                                        </div>
-                                        <button onClick={closeModal} className="text-slate-500 hover:text-white hidden md:block">
-                                            <XMarkIcon className="w-6 h-6" />
-                                        </button>
-                                    </div>
+  const handleLike = async () => {
+    if (liking || !onArtworkUpdate) return;
+    setLiking(true);
+    try {
+      const res = await api.post(`/artworks/${artwork._id}/like`);
+      const updated = res.data?.data?.artwork;
+      if (updated) onArtworkUpdate(updated);
+    } catch (err) {
+      console.error('Like error:', err);
+    } finally {
+      setLiking(false);
+    }
+  };
 
-                                    {/* Scrollable Content */}
-                                    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
-                                        <div>
-                                            <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{artwork.title}</h2>
-                                            <p className="text-sm text-slate-300 leading-relaxed">{artwork.description}</p>
+  const handleComment = async (e) => {
+    e?.preventDefault();
+    const text = commentText.trim();
+    if (!text || commenting || !onArtworkUpdate) return;
+    setCommenting(true);
+    try {
+      const res = await api.post(`/artworks/${artwork._id}/comments`, { text });
+      const updated = res.data?.data;
+      if (updated) onArtworkUpdate(updated);
+      setCommentText('');
+      setTimeout(scrollCommentsToBottom, 100);
+    } catch (err) {
+      console.error('Comment error:', err);
+    } finally {
+      setCommenting(false);
+    }
+  };
 
-                                            {/* Tags */}
-                                            <div className="flex flex-wrap gap-2 mt-4">
-                                                {artwork.tags?.map((tag, i) => (
-                                                    <span key={i} className="px-2 py-1 text-xs rounded bg-slate-800 text-slate-400 border border-white/5">#{tag}</span>
-                                                ))}
-                                            </div>
-                                        </div>
+  const handleFollow = async () => {
+    if (following || !ownerId || isOwner || !onFollowSuccess) return;
+    setFollowing(true);
+    try {
+      await api.post(`/user/${ownerId}/follow`);
+      onFollowSuccess();
+    } catch (err) {
+      console.error('Follow error:', err);
+    } finally {
+      setFollowing(false);
+    }
+  };
 
-                                        <div className="border-t border-white/5 pt-4">
-                                            <h4 className="text-sm font-bold text-white mb-4">Comments ({artwork.comments?.length || 0})</h4>
-                                            <div className="text-center text-slate-500 text-xs py-4">No comments yet. Be the first!</div>
-                                        </div>
-                                    </div>
+  return (
+    <Transition appear show={isOpen} as={React.Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={closeModal}>
+        <Transition.Child
+          as={React.Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" />
+        </Transition.Child>
 
-                                    {/* Footer: Actions */}
-                                    <div className="p-4 border-t border-white/5 bg-slate-900/50 flex-shrink-0">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex gap-4">
-                                                <button className="flex items-center gap-1.5 text-white hover:text-pink-500 transition-colors group">
-                                                    <HeartIcon className="w-6 h-6 group-hover:hidden" />
-                                                    <HeartSolid className="w-6 h-6 hidden group-hover:block text-pink-500" />
-                                                    <span className="text-sm font-medium">{artwork.likes?.length || 0}</span>
-                                                </button>
-                                                <button className="flex items-center gap-1.5 text-white hover:text-cyan-400 transition-colors">
-                                                    <ChatBubbleLeftIcon className="w-6 h-6" />
-                                                </button>
-                                                <button className="text-white hover:text-slate-300">
-                                                    <ShareIcon className="w-6 h-6" />
-                                                </button>
-                                            </div>
-                                        </div>
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-2 md:p-4">
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-5xl h-[90vh] md:h-[85vh] transform overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl flex flex-col md:flex-row">
 
-                                        {/* Comment Input */}
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="Add a comment..."
-                                                className="w-full bg-slate-800 border border-white/10 rounded-full py-2.5 pl-4 pr-12 text-sm text-white focus:outline-none focus:border-violet-500"
-                                            />
-                                            <button className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-violet-400 hover:text-violet-300 px-2">Post</button>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </Dialog.Panel>
-                        </Transition.Child>
-                    </div>
+                <div className="w-full md:w-2/3 h-[40%] md:h-full bg-black flex items-center justify-center relative">
+                  <img
+                    src={artwork.image}
+                    alt={artwork.title}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                  <button
+                    onClick={closeModal}
+                    className="absolute top-4 left-4 p-2 bg-black/50 rounded-full text-white hover:bg-white/20 md:hidden z-10"
+                  >
+                    <XMarkIcon className="w-6 h-6" />
+                  </button>
                 </div>
-            </Dialog>
-        </Transition>
-    );
+
+                <div className="w-full md:w-1/3 h-[60%] md:h-full bg-slate-900 border-t md:border-t-0 md:border-l border-white/5 flex flex-col">
+
+                  <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between flex-shrink-0">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={artwork.owner?.profilePicture || 'https://via.placeholder.com/40'}
+                        alt="Avatar"
+                        className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/10"
+                      />
+                      <div>
+                        <h3 className="text-sm font-bold text-white">{artwork.owner?.username}</h3>
+                        {!isOwner && (
+                          <motion.button
+                            onClick={handleFollow}
+                            disabled={following}
+                            className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors disabled:opacity-60 ${
+                              isFollowingOwner
+                                ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                                : 'bg-violet-600 text-white hover:bg-violet-500'
+                            }`}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {isFollowingOwner ? 'Unfollow' : 'Follow'}
+                          </motion.button>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={closeModal}
+                      className="text-slate-500 hover:text-white hidden md:block"
+                    >
+                      <XMarkIcon className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{artwork.title}</h2>
+                      <p className="text-sm text-slate-300 leading-relaxed">{artwork.description || ''}</p>
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {artwork.tags?.map((tag, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 text-xs rounded bg-slate-800 text-slate-400 border border-white/5"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/5 pt-4 flex flex-col min-h-0">
+                      <h4 className="text-sm font-bold text-white mb-3">Comments ({comments.length})</h4>
+                      <div
+                        className="flex-1 min-h-[120px] max-h-[200px] overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent"
+                        style={{ overflowY: 'auto' }}
+                      >
+                        {comments.length === 0 ? (
+                          <p className="text-center text-slate-500 text-xs py-4">No comments yet. Be the first!</p>
+                        ) : (
+                          comments.map((c, i) => (
+                            <div key={i} className="flex gap-2 text-sm">
+                              <img
+                                src={c.user?.profilePicture}
+                                alt=""
+                                className="w-6 h-6 rounded-full flex-shrink-0"
+                              />
+                              <div>
+                                <span className="font-medium text-white">{c.user?.username}</span>
+                                <span className="text-slate-400 ml-1">{c.text}</span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                        <div ref={commentsEndRef} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-white/5 bg-slate-900/50 flex-shrink-0">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex gap-4">
+                        <motion.button
+                          onClick={handleLike}
+                          disabled={liking}
+                          className="flex items-center gap-1.5 text-white hover:text-pink-500 transition-colors focus:outline-none disabled:opacity-60"
+                          whileTap={{ scale: 0.9 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                        >
+                          {liked ? (
+                            <HeartSolid className="w-6 h-6 text-pink-500" />
+                          ) : (
+                            <HeartIcon className="w-6 h-6" />
+                          )}
+                          <span className="text-sm font-medium">{likeCount}</span>
+                        </motion.button>
+                        <span className="flex items-center gap-1.5 text-slate-400">
+                          <ChatBubbleLeftIcon className="w-6 h-6" />
+                          <span className="text-sm">{comments.length}</span>
+                        </span>
+                        <button className="text-white hover:text-slate-300">
+                          <ShareIcon className="w-6 h-6" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleComment} className="relative">
+                      <input
+                        type="text"
+                        placeholder="Add a comment..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        className="w-full bg-slate-800 border border-white/10 rounded-full py-2.5 pl-4 pr-12 text-sm text-white focus:outline-none focus:border-violet-500"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!commentText.trim() || commenting}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-violet-400 hover:text-violet-300 px-2 disabled:opacity-50"
+                      >
+                        {commenting ? '...' : 'Post'}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
 };
 
 export default ArtworkModal;
