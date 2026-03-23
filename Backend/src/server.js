@@ -14,7 +14,7 @@ connectDB();
 
 // ✅ Create HTTP server
 const server = http.createServer(app);
-
+server.setTimeout(10 * 60 * 1000);
 // ✅ Create Socket.IO server
 const io = new Server(server, {
   cors: {

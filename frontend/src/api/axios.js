@@ -9,7 +9,7 @@ export const injectStore = (_store) => {
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api/v1",
-  withCredentials: true,
+  withCredentials: true, // Ensure cookies are sent with every request
 });
 
 // No request interceptor: auth uses cookies only (sent automatically with withCredentials: true).
@@ -33,22 +33,25 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Refresh using cookies only (no body, no Redux token).
-        const response = await axios.get(
+        // Correctly send the refresh token using cookies
+        const response = await axios.post(
           "http://localhost:5000/api/v1/user/refresh",
-          { withCredentials: true }
+          {}, // No body needed
+          { withCredentials: true } // Ensure cookies are sent
         );
 
         const { user } = response.data?.data ?? {};
         const currentUser = store?.getState()?.auth?.user;
 
+        // Update Redux store with the refreshed user data
         store.dispatch(
           setCredentials({ user: user ?? currentUser })
         );
 
-        // Retry: cookies (including new accessToken) are sent automatically.
+        // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
+        // Logout the user if the refresh token fails
         store.dispatch(logout());
         return Promise.reject(refreshError);
       }

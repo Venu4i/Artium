@@ -29,6 +29,7 @@ const FeedPage = () => {
     }, []);
 
     const openModal = async (artwork) => {
+        console.log("Opening modal for:", artwork);
         setSelectedArtwork(artwork);
         setIsModalOpen(true);
         try {

@@ -5,7 +5,7 @@ import { setCredentials, logout, setCheckingAuth } from "./store/authSlice";
 import api from "./api/axios"; // Ensure this matches your actual file path (e.g., ./utils/api)
 
 // Components
-import AuthPage from "./components/AuthPage";
+import AuthPage from "./pages/AuthPage";
 import MainLayout from "./layout/MainLayout";
 import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -34,7 +34,7 @@ function App() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await api.get("/user/refresh");
+        const response = await api.post("/user/refresh");
         const { user } = response.data?.data ?? {};
         if (user) dispatch(setCredentials({ user }));
       } catch {

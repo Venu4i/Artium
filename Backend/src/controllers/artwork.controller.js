@@ -6,6 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // 1. Upload Artwork
 const uploadArtwork = asyncHandler(async (req, res) => {
+    console.log('Upload started');
     const { title, description, tags, communityId } = req.body;
 
     if (!req.file) {
@@ -21,11 +22,11 @@ const uploadArtwork = asyncHandler(async (req, res) => {
         community: communityId || null,
         tags: tags ? tags.split(",").map(tag => tag.trim()) : []
     });
-
+    console.log('Upload process');
     await User.findByIdAndUpdate(req.user._id, {
         $push: { posts: artwork._id }
     });
-
+    console.log('Upload completed');
     return res
         .status(201)
         .json(new ApiResponse(201, artwork, "Artwork uploaded successfully"));
@@ -56,6 +57,7 @@ const getFeed = asyncHandler(async (req, res) => {
 // 3. Get single artwork (for modal, with comments populated)
 const getArtworkById = asyncHandler(async (req, res) => {
     const { artworkId } = req.params;
+    
     const userId = req.user?._id;
 
     const artwork = await Artwork.findById(artworkId)
@@ -117,7 +119,7 @@ const addComment = asyncHandler(async (req, res) => {
         .populate("owner", "username profilePicture")
         .populate("comments.user", "username profilePicture")
         .lean();
-    const likedByMe = artwork.likes.some((id) => id.toString() === userId.toString());
+    const likedByMe = populated.likes.some((id) => id.toString() === userId.toString());
     populated.likedByMe = likedByMe;
 
     return res

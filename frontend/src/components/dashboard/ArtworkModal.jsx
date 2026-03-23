@@ -24,8 +24,22 @@ const ArtworkModal = ({
   const [following, setFollowing] = useState(false);
   const commentsEndRef = useRef(null);
 
+  const scrollCommentsToBottom = () => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // ✅ HOOK MOVED HERE: Always call useEffect, regardless of if artwork exists
+  useEffect(() => {
+    // We use optional chaining (?.) so it doesn't crash if artwork is null
+    if (isOpen && artwork?.comments?.length) {
+      scrollCommentsToBottom();
+    }
+  }, [isOpen, artwork?.comments?.length]);
+
+  // ✅ EARLY RETURN MOVED HERE: Now it happens AFTER all hooks are declared
   if (!artwork) return null;
 
+  // Now it's safe to derive these variables because we know artwork is not null
   const liked = artwork.likedByMe === true;
   const likeCount = Array.isArray(artwork.likes) ? artwork.likes.length : 0;
   const comments = artwork.comments || [];
@@ -34,13 +48,6 @@ const ArtworkModal = ({
   const isFollowingOwner =
     currentUser?.following?.some((id) => id.toString() === (ownerId || '').toString()) ?? false;
 
-  const scrollCommentsToBottom = () => {
-    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    if (isOpen && comments.length) scrollCommentsToBottom();
-  }, [isOpen, comments.length]);
 
   const handleLike = async () => {
     if (liking || !onArtworkUpdate) return;
