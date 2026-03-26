@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-slate-100 antialiased;
+    overflow: hidden; /* Prevent double scrollbars on the main page */
+  }
+}
+
+@layer components {
+  /* The "Chroma Canvas" Glass Effect */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  }
+
+  /* Custom Scrollbar for the Artist list and Chat window */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-zinc-800 rounded-full hover:bg-violet-600 transition-colors;
+  }
+
+  /* Vibrant Glows */
+  .glow-violet {
+    @apply shadow-[0_0_20px_rgba(124,58,237,0.3)];
+  }
+  
+  .glow-cyan {
+    @apply shadow-[0_0_15px_rgba(34,211,238,0.3)];
+  }
+}

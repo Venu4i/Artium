@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
-// import { getIO } from "./socket/index.js"; // 👈 CRITICAL: Added this import
+import  {getIO}  from "./socket/index.js"; // 👈 CRITICAL: Added this import
 
 dotenv.config();
 

@@ -4,7 +4,9 @@ import connectDB from "./DB/index.js";
 import http from "http";
 import { Server } from "socket.io";
 
-import socketAuth from "./socket/index.js";
+// ✅ Import initIO along with your middleware
+import { initIO } from "./socket/index.js"; 
+import socketAuth from "./socket/auth.js"
 import registerSocketHandlers from "./socket/handlers.js";
 
 dotenv.config();
@@ -23,12 +25,18 @@ const io = new Server(server, {
   },
 });
 
+// ✅ CRITICAL: Initialize the IO instance for the rest of your app
+initIO(io); 
+
 // ✅ Socket auth middleware (MUST be before connection)
 io.use(socketAuth);
 
 // ✅ Socket connection
 io.on("connection", (socket) => {
-  console.log("🟢 User connected:", socket.user._id.toString());
+  // Safe check in case auth fails or user object isn't attached
+  if (socket.user) {
+    console.log("🟢 User connected:", socket.user._id.toString());
+  }
 
   // Delegate ALL logic
   registerSocketHandlers(io, socket);

@@ -68,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!identifier || !password) {
     throw new ApiError(400, "Username or email and password are required");
   }
-  console.log("incoming", identifier , password)
+  console.log("incoming", identifier)
 
   // 1. Normalize the identifier to lowercase to match the registration format
   const normalizedIdentifier = identifier.trim().toLowerCase();

@@ -78,17 +78,14 @@ export const markAsRead = async (req, res, next) => {
 
     await Message.updateMany(
       { conversationId, receiver: myId, isRead: false },
-      { isRead: true }
+      { $set: { isRead: true } } // Added $set
     );
 
     await Conversation.findByIdAndUpdate(conversationId, {
       $set: { [`unreadCounts.${myId}`]: 0 },
     });
 
-    res.status(200).json({
-      success: true,
-      message: "Messages marked as read",
-    });
+    res.status(200).json({ success: true, message: "Messages marked as read" });
   } catch (err) {
     next(err);
   }

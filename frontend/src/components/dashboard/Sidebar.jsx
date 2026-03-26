@@ -1,13 +1,14 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react'; // Added useMemo for performance
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
 import {
     HomeIcon, UserIcon, CloudArrowUpIcon, UserGroupIcon,
-    TrophyIcon, Cog6ToothIcon, XMarkIcon
+    TrophyIcon, Cog6ToothIcon, XMarkIcon,
+    ChatBubbleLeftRightIcon // Added for Chat
 } from '@heroicons/react/24/outline';
 
-// 1. IMPROVED NAV ITEM (Smooth CSS Transitions, No Lag)
+// 1. IMPROVED NAV ITEM
 const NavItem = ({ icon: Icon, label, to, onClick }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -22,7 +23,6 @@ const NavItem = ({ icon: Icon, label, to, onClick }) => {
                         : "text-slate-400 border-transparent hover:bg-white/5 hover:text-white"
                 }`}
             >
-                {/* Active Indicator Line (Optional Modern Touch) */}
                 {isActive && (
                     <div className="absolute left-0 h-6 w-1 bg-violet-500 rounded-r-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
                 )}
@@ -38,35 +38,42 @@ const NavItem = ({ icon: Icon, label, to, onClick }) => {
     );
 };
 
-// Reusable Content (Brand + Links + Stats)
-const NavContent = ({ user, closeMobileMenu }) => (
-    <div className="flex flex-col h-full">
-        {/* Brand */}
-        <div className="flex items-center justify-between px-2 mb-10">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-400 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-900/20">
-                    A
+// Reusable Content
+const NavContent = ({ user, closeMobileMenu }) => {
+    // Calculate total likes across all user posts
+    const totalLikes = useMemo(() => {
+        if (!user?.posts) return 0;
+        return user.posts.reduce((acc, post) => acc + (post.likes?.length || 0), 0);
+    }, [user]);
+
+    return (
+        <div className="flex flex-col h-full">
+            {/* Brand */}
+            <div className="flex items-center justify-between px-2 mb-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-400 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-900/20">
+                        A
+                    </div>
+                    <span className="text-xl font-bold tracking-tight text-white">ArtistConnect</span>
                 </div>
-                <span className="text-xl font-bold tracking-tight text-white">ArtistConnect</span>
+
+                {closeMobileMenu && (
+                    <button onClick={closeMobileMenu} className="p-1 text-slate-400 hover:text-white md:hidden transition-colors">
+                        <XMarkIcon className="w-6 h-6" />
+                    </button>
+                )}
             </div>
 
-            {/* Mobile Close Button */}
-            {closeMobileMenu && (
-                <button onClick={closeMobileMenu} className="p-1 text-slate-400 hover:text-white md:hidden transition-colors">
-                    <XMarkIcon className="w-6 h-6" />
-                </button>
-            )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="space-y-1 flex-1">
-            <NavItem to="/feed" icon={HomeIcon} label="Home" onClick={closeMobileMenu} />
-            <NavItem to="/profile" icon={UserIcon} label="Profile" onClick={closeMobileMenu} />
-            <NavItem to="/upload" icon={CloudArrowUpIcon} label="Upload" onClick={closeMobileMenu} />
-            <NavItem to="/communities" icon={UserGroupIcon} label="Communities" onClick={closeMobileMenu} />
-            <NavItem to="/challenges" icon={TrophyIcon} label="Challenges" onClick={closeMobileMenu} />
-            <NavItem to="/settings" icon={Cog6ToothIcon} label="Settings" onClick={closeMobileMenu} />
-        </nav>
+            {/* Navigation */}
+            <nav className="space-y-1 flex-1">
+                <NavItem to="/feed" icon={HomeIcon} label="Home" onClick={closeMobileMenu} />
+                <NavItem to="/chat" icon={ChatBubbleLeftRightIcon} label="Messages" onClick={closeMobileMenu} />
+                <NavItem to="/profile" icon={UserIcon} label="Profile" onClick={closeMobileMenu} />
+                <NavItem to="/upload" icon={CloudArrowUpIcon} label="Upload" onClick={closeMobileMenu} />
+                <NavItem to="/communities" icon={UserGroupIcon} label="Communities" onClick={closeMobileMenu} />
+                <NavItem to="/challenges" icon={TrophyIcon} label="Challenges" onClick={closeMobileMenu} />
+                <NavItem to="/settings" icon={Cog6ToothIcon} label="Settings" onClick={closeMobileMenu} />
+            </nav>
 
         {/* Stats Card */}
         {user && (
@@ -96,19 +103,17 @@ const NavContent = ({ user, closeMobileMenu }) => (
         )}
     </div>
 );
+}
 
 const Sidebar = ({ user, mobileOpen, setMobileOpen }) => {
     return (
         <>
-            {/* 1. DESKTOP SIDEBAR (Hidden on Mobile) */}
             <aside className="w-64 flex-shrink-0 flex-col p-6 border-r border-white/5 bg-slate-900/50 backdrop-blur-sm hidden md:flex h-screen sticky top-0">
                 <NavContent user={user} />
             </aside>
 
-            {/* 2. MOBILE SIDEBAR (Dialog) */}
             <Transition show={mobileOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-50 md:hidden" onClose={setMobileOpen}>
-                    {/* Backdrop */}
                     <Transition.Child
                         as={Fragment}
                         enter="transition-opacity duration-300"
@@ -142,4 +147,4 @@ const Sidebar = ({ user, mobileOpen, setMobileOpen }) => {
     );
 };
 
-export default Sidebar;
+export default Sidebar

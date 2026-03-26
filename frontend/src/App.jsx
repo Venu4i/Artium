@@ -2,7 +2,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { setCredentials, logout, setCheckingAuth } from "./store/authSlice";
-import api from "./api/axios"; // Ensure this matches your actual file path (e.g., ./utils/api)
+import api from "./api/axios";
+
+// Providers
+import { SocketProvider } from "./context/SocketContext"; // 👈 Added SocketProvider
 
 // Components
 import AuthPage from "./pages/AuthPage";
@@ -10,6 +13,7 @@ import MainLayout from "./layout/MainLayout";
 import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
 import UploadPage from "./pages/UploadPage";
+import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 
 // Protected Route Wrapper
 const ProtectedLayout = () => {
@@ -19,9 +23,13 @@ const ProtectedLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // If authenticated, render the MainLayout which contains the Sidebar/Topbar
-  // and the <Outlet /> for child routes (Feed, Profile, etc.)
-  return <MainLayout />;
+  // Wrap the MainLayout in SocketProvider so chat works everywhere 
+  // while the user is logged in
+  return (
+    <SocketProvider>
+      <MainLayout />
+    </SocketProvider>
+  );
 };
 
 function App() {
@@ -46,7 +54,6 @@ function App() {
     initAuth();
   }, [dispatch]);
 
-  // 2. Loading Spinner
   if (isCheckingAuth) {
     return (
       <div className="h-screen bg-slate-950 flex items-center justify-center text-white">
@@ -66,19 +73,18 @@ function App() {
           }
         />
 
-        {/* --- Protected Routes (Wrapped in MainLayout) --- */}
+        {/* --- Protected Routes (Wrapped in MainLayout & SocketProvider) --- */}
         <Route element={<ProtectedLayout />}>
-          {/* Redirect root "/" to "/feed" */}
           <Route path="/" element={<Navigate to="/feed" replace />} />
           
-          {/* Main Dashboard View */}
           <Route path="/feed" element={<FeedPage />} />
           
-          {/* User Profile */}
           <Route path="/profile" element={<ProfilePage />} />
           
           <Route path="/upload" element={<UploadPage />} />
-          {/* <Route path="/settings" element={<SettingsPage />} /> */}
+
+          {/* --- Chroma Canvas Chat Route --- */}
+          <Route path="/chat" element={<ChatPage />} /> 
         </Route>
 
         {/* --- 404 Catch-all --- */}
