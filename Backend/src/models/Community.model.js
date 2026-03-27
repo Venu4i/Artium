@@ -10,6 +10,10 @@ const communitySchema = new mongoose.Schema(
 
         // List of members
         members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+        // Pending membership requests
+        pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
         isPrivate: { type: Boolean, default: false },
 
         // Invitation records

@@ -14,6 +14,10 @@ import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
 import UploadPage from "./pages/UploadPage";
 import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
+import ExploreCommunities from "./pages/ExploreCommunities";
+import MyCommunities from "./pages/MyCommunities";
+import CommunityPage from "./pages/CommunityPage";
+import AcceptInvite from "./pages/AcceptInvite";
 
 // Protected Route Wrapper
 const ProtectedLayout = () => {
@@ -85,6 +89,12 @@ function App() {
 
           {/* --- Chroma Canvas Chat Route --- */}
           <Route path="/chat" element={<ChatPage />} /> 
+
+          {/* --- Community System Routes --- */}
+          <Route path="/communities" element={<ExploreCommunities />} />
+          <Route path="/my-communities" element={<MyCommunities />} />
+          <Route path="/community/:id" element={<CommunityPage />} />
+          <Route path="/community/invite/:token" element={<AcceptInvite />} />
         </Route>
 
         {/* --- 404 Catch-all --- */}

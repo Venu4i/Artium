@@ -45,12 +45,14 @@ import userRouter from "./routes/user.routes.js";
 import messageRouter from "./routes/message.routes.js";
 import conversationRouter from "./routes/conversation.routes.js";
 import artworkRouter from "./routes/artwork.routes.js";
+import communityRouter from "./routes/community.routes.js";
+
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/artworks", artworkRouter);
-console.log("✅ Artwork router mounted at /api/v1/artworks");
+app.use("/api/v1/community", communityRouter);
 
 // ✅ Health check (VERY useful)
 app.get("/health", (_, res) => {

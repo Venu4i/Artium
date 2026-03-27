@@ -2,15 +2,19 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 
-const SocketContext = createContext();
+const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const { token, isAuthenticated } = useSelector((state) => state.auth);
+  
+  // 🚨 FIX: Extract 'user' directly from your auth state
+  // If your slice puts it in state.auth.user, use that.
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Only attempt connection if we are authenticated and have a token
-    if (!isAuthenticated || !token) {
+    // 🚨 FIX: Check for the 'user' object since that's what App.jsx sets
+    if (!user) {
+      console.log("🔒 No user found in Redux. Socket standby.");
       if (socket) {
         socket.disconnect();
         setSocket(null);
@@ -18,18 +22,19 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    console.log("📡 Initializing Chroma Socket Connection...");
+    console.log("📡 Initializing Socket Connection for:", user.username);
 
     const newSocket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:5000", {
       auth: {
-        token: token, // This matches backend socketAuth.js: const token = socket.handshake.auth.token;
+        // Ensure this matches how your backend expects the token/user
+        userId: user._id 
       },
       withCredentials: true,
-      transports: ["websocket"], // Forces modern websocket transport
+      transports: ["websocket"], 
     });
 
     newSocket.on("connect", () => {
-      console.log("✅ Chroma Canvas Connected:", newSocket.id);
+      console.log("✅ Artium Socket Connected! ID:", newSocket.id);
     });
 
     newSocket.on("connect_error", (err) => {
@@ -38,12 +43,12 @@ export const SocketProvider = ({ children }) => {
 
     setSocket(newSocket);
 
-    // Cleanup on logout or unmount
     return () => {
       console.log("🔌 Closing Socket Connection");
       newSocket.close();
+      setSocket(null);
     };
-  }, [token, isAuthenticated]);
+  }, [user?._id]); // Only re-run if the User ID actually changes
 
   return (
     <SocketContext.Provider value={socket}>

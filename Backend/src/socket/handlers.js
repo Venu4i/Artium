@@ -11,8 +11,22 @@ const registerSocketHandlers = (io, socket) => {
     socket.join(communityId);
   });
 
+  // Send community message
+  socket.on("send-community-message", async (data) => {
+    const { communityId, content, attachments } = data;
+
+    const message = await Message.create({
+      sender: socket.user._id,
+      community: communityId,
+      content,
+      attachments: attachments || [],
+    });
+
+    io.to(communityId).emit("new-message", message);
+  });
+
   // Send message
-socket.on("send-message", async (data) => {
+  socket.on("send-message", async (data) => {
     const {
         content,
         receiver,
@@ -44,7 +58,6 @@ socket.on("send-message", async (data) => {
     io.to(receiverId).emit("new-message", message);
     socket.emit("new-message", message);
     });
-
 
   socket.on("disconnect", () => {
     console.log("🔴 User disconnected:", socket.user._id.toString());

@@ -43,7 +43,8 @@ const Chat = ({ activeConversation, currentUser }) => {
       {/* Message Canvas */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
         <AnimatePresence initial={false}>
-          {messages.map((msg) => {
+        {messages && messages.length > 0 ? (
+          messages.map((msg) => {
             const isMe = msg.sender === currentUser._id || msg.sender?._id === currentUser._id;
             return (
               <motion.div
@@ -61,7 +62,12 @@ const Chat = ({ activeConversation, currentUser }) => {
                 </div>
               </motion.div>
             );
-          })}
+          })
+        ) : (
+          <div className="text-center text-gray-500 mt-10">
+            No messages yet. Start the collaboration by sending a message!
+          </div>
+        )}
         </AnimatePresence>
         <div ref={scrollRef} />
       </div>

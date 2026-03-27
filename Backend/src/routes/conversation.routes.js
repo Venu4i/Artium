@@ -10,10 +10,11 @@ const router = express.Router();
 
 router.use(verifyJWT); // Protect all routes below
 
+// This is the line that matches chatService.getDiscoveryUsers
+router.get("/discovery", getRandomDiscoveryUsers); 
 router.get("/", getMyConversations);
 router.post("/", getOrCreateConversation);
 
-// This is the line that matches chatService.getDiscoveryUsers
-router.get("/discovery", getRandomDiscoveryUsers); 
+
 
 export default router;

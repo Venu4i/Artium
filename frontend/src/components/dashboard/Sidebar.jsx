@@ -69,8 +69,12 @@ const NavContent = ({ user, closeMobileMenu }) => {
                 <NavItem to="/feed" icon={HomeIcon} label="Home" onClick={closeMobileMenu} />
                 <NavItem to="/chat" icon={ChatBubbleLeftRightIcon} label="Messages" onClick={closeMobileMenu} />
                 <NavItem to="/profile" icon={UserIcon} label="Profile" onClick={closeMobileMenu} />
+                
+                {/* Community Section */}
+                <NavItem to="/communities" icon={UserGroupIcon} label="Explore Hubs" onClick={closeMobileMenu} />
+                <NavItem to="/my-communities" icon={UserGroupIcon} label="My Communities" onClick={closeMobileMenu} />
+                
                 <NavItem to="/upload" icon={CloudArrowUpIcon} label="Upload" onClick={closeMobileMenu} />
-                <NavItem to="/communities" icon={UserGroupIcon} label="Communities" onClick={closeMobileMenu} />
                 <NavItem to="/challenges" icon={TrophyIcon} label="Challenges" onClick={closeMobileMenu} />
                 <NavItem to="/settings" icon={Cog6ToothIcon} label="Settings" onClick={closeMobileMenu} />
             </nav>
