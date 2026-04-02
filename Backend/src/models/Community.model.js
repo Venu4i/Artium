@@ -34,6 +34,10 @@ const communitySchema = new mongoose.Schema(
                 },
             },
         ],
+        challenges: [{ 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "Challenge" 
+        }],
     },
     { timestamps: true }
 );

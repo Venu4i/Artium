@@ -79,6 +79,22 @@ const userModel = new mongoose.Schema(
     // 👀 Socket integration
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
+
+    // 🏆 Gamification & Progress
+    points: { 
+        type: Number, 
+        default: 0 
+    },
+    completedChallenges: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Challenge" 
+    }],
+    
+    // Community-specific points if you want separate leaderboards
+    communityStats: [{
+        community: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
+        points: { type: Number, default: 0 }
+    }],
   },
   { timestamps: true }
 );

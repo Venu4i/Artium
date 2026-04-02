@@ -1,5 +1,6 @@
 import { Conversation } from "../models/Conversation.model.js";
 import User from "../models/User.model.js"
+import mongoose from "mongoose";
 /**
  * Get or create a 1–1 conversation
  */
@@ -51,26 +52,44 @@ export const getMyConversations = async (req, res, next) => {
   }
 };
 
+
+
 export const getRandomDiscoveryUsers = async (req, res, next) => {
   try {
-    const myId = req.user._id;
+    const myId = new mongoose.Types.ObjectId(req.user._id);
 
-    // 1. Get IDs of people I'm already talking to
-    const existingConversations = await Conversation.find({ participants: myId });
+    const existingConversations = await Conversation.find({
+      participants: myId
+    });
 
-    // Use optional chaining and a fallback empty array
-    const existingContactIds = existingConversations?.flatMap(c => 
-      c.participants.filter(p => p?.toString() !== myId.toString())
-    ) || [];
+    const existingContactIds = existingConversations.flatMap(c => {
+      if (!Array.isArray(c.participants)) return [];
 
-    // 2. Find users NOT in that list and NOT me
+      return c.participants
+        .map(p =>
+          typeof p === "string"
+            ? new mongoose.Types.ObjectId(p)
+            : p
+        )
+        .filter(p => p && !p.equals(myId));
+    });
+
+    const excludedIds = [...existingContactIds, myId];
+
+    console.log("Excluded:", excludedIds.map(id => id.toString()));
+
     const discoveryUsers = await User.find({
-      _id: { $nin: [...existingContactIds, myId] }
+      _id: { $nin: excludedIds }
     })
-    .select("username avatar bio")
-    .limit(10);
+      .select("username avatar bio")
+      .limit(10);
 
-    res.status(200).json({ success: true, data: discoveryUsers });
+    console.log("Discovery Users:", discoveryUsers);
+
+    res.status(200).json({
+      success: true,
+      data: discoveryUsers
+    });
   } catch (err) {
     next(err);
   }

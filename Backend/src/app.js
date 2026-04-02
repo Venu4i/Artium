@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
-import  {getIO}  from "./socket/index.js"; // 👈 CRITICAL: Added this import
+import  {getIO}  from "./socket/index.js";
 
 dotenv.config();
 
@@ -29,16 +29,15 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-// // ✅ Socket Middleware
-// app.use((req, res, next) => {
-//   try {
-//     req.io = getIO(); // Now this function exists because we imported it!
-//   } catch (err) {
-//     // It's normal for IO to not be ready for the very first split second or in tests
-//     // console.error("Socket not initialized yet"); 
-//   }
-//   next();
-// });
+// ✅ Socket Middleware
+app.use((req, res, next) => {
+  try {
+    req.io = getIO();
+  } catch (err) {
+     console.error("Socket not initialized yet"); 
+  }
+  next();
+});
 
 // ✅ Routes
 import userRouter from "./routes/user.routes.js";
@@ -46,6 +45,7 @@ import messageRouter from "./routes/message.routes.js";
 import conversationRouter from "./routes/conversation.routes.js";
 import artworkRouter from "./routes/artwork.routes.js";
 import communityRouter from "./routes/community.routes.js";
+import challengeRouter from "./routes/challenge.routes.js";
 
 
 app.use("/api/v1/user", userRouter);
@@ -53,6 +53,7 @@ app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/artworks", artworkRouter);
 app.use("/api/v1/community", communityRouter);
+app.use("/api/v1/challenges", challengeRouter);
 
 // ✅ Health check (VERY useful)
 app.get("/health", (_, res) => {
