@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
-import HeroBanner from '../components/dashboard/HeroBanner';
 import FeedCard from '../components/dashboard/FeedCard';
 import ArtworkModal from '../components/dashboard/ArtworkModal';
+import Masonry from 'react-masonry-css';
 
 const FeedPage = () => {
     const { currentUser, refreshUser } = useOutletContext();
     const [artworks, setArtworks] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    // States for Modals
     const [selectedArtwork, setSelectedArtwork] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
     const [likingId, setLikingId] = useState(null);
 
     useEffect(() => {
@@ -28,17 +30,20 @@ const FeedPage = () => {
         fetchFeed();
     }, []);
 
-    const openModal = async (artwork) => {
-        console.log("Opening modal for:", artwork);
-        setSelectedArtwork(artwork);
-        setIsModalOpen(true);
+    const fetchFullArtwork = async (artwork, callback) => {
         try {
             const res = await api.get(`/artworks/${artwork._id}`);
             const full = res.data?.data;
-            if (full) setSelectedArtwork(full);
+            if (full) callback(full);
         } catch (e) {
             console.error('Fetch artwork:', e);
         }
+    };
+
+    const openModal = (artwork) => {
+        setSelectedArtwork(artwork);
+        setIsModalOpen(true);
+        fetchFullArtwork(artwork, setSelectedArtwork);
     };
 
     const updateArtworkInList = (updated) => {
@@ -46,9 +51,9 @@ const FeedPage = () => {
         setArtworks((prev) =>
             prev.map((a) => (a._id === updated._id ? { ...a, ...updated } : a))
         );
-        if (selectedArtwork?._id === updated._id) {
-            setSelectedArtwork((prev) => (prev ? { ...prev, ...updated } : updated));
-        }
+        
+        // Sync active states
+        if (selectedArtwork?._id === updated._id) setSelectedArtwork(prev => ({ ...prev, ...updated }));
     };
 
     const handleLike = async (artwork) => {
@@ -65,42 +70,71 @@ const FeedPage = () => {
         }
     };
 
-    const handleModalArtworkUpdate = (updated) => {
-        updateArtworkInList(updated);
-        setSelectedArtwork((prev) => (prev && updated && prev._id === updated._id ? { ...prev, ...updated } : prev));
+    const handleFollow = async (userId, isFollowing) => {
+        if (!userId || isFollowing) return; // For now, the card only handles following, not unfollowing to prevent accidental clicks
+        try {
+            await api.post(`/user/${userId}/follow`);
+            refreshUser();
+        } catch (err) {
+            console.error('Follow error:', err);
+        }
+    };
+
+    const breakpointColumnsObj = {
+        default: 4,
+        1280: 3,
+        1024: 3,
+        768: 2,
+        640: 1
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <HeroBanner username={currentUser?.username} />
+        <div className="min-h-screen bg-transparent transition-colors duration-500">
+            <div className="max-w-7xl mx-auto pt-8 pb-20">
+                
+                {/* Header Section */}
+                <header className="mb-10 ">
+                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight mb-2 text-black dark:text-white ">
+                        Welcome back, {currentUser?.username || 'Creator'}.
+                    </h1>
+                    <p className="text-lg text-slate-500 dark:text-slate-400 font-light tracking-wide">
+                        Discover today's infinite canvas.
+                    </p>
+                </header>
 
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 md:gap-6 space-y-4 md:space-y-6 pb-20">
                 {loading ? (
-                    <div className="text-slate-500 text-center py-20 col-span-full">Loading inspiration...</div>
+                    <div className="text-slate-500 text-center py-20">Loading inspiration...</div>
                 ) : (
-                    <AnimatePresence>
+                    <Masonry
+                        breakpointCols={breakpointColumnsObj}
+                        className="flex w-auto -ml-4 md:-ml-6"
+                        columnClassName="pl-4 md:pl-6 bg-clip-padding"
+                    >
                         {artworks.map((art, i) => (
                             <FeedCard
                                 key={art._id}
                                 artwork={art}
                                 index={i}
+                                currentUser={currentUser}
                                 onClick={openModal}
                                 onLike={handleLike}
                                 disabledLike={likingId === art._id}
+                                onCommentClick={openModal} // Comment opens modal directly
+                                onFollow={handleFollow}
                             />
                         ))}
-                    </AnimatePresence>
+                    </Masonry>
                 )}
-            </div>
 
-            <ArtworkModal
-                isOpen={isModalOpen}
-                closeModal={() => setIsModalOpen(false)}
-                artwork={selectedArtwork}
-                currentUser={currentUser}
-                onArtworkUpdate={handleModalArtworkUpdate}
-                onFollowSuccess={refreshUser}
-            />
+                <ArtworkModal
+                    isOpen={isModalOpen}
+                    closeModal={() => setIsModalOpen(false)}
+                    artwork={selectedArtwork}
+                    currentUser={currentUser}
+                    onArtworkUpdate={updateArtworkInList}
+                    onFollowSuccess={refreshUser}
+                />
+            </div>
         </div>
     );
 };

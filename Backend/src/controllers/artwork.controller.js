@@ -157,6 +157,19 @@ const getMyLikedArtworks = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, list, "Liked artworks"));
 });
 
+// 8. Increment Share count
+const incrementShare = asyncHandler(async (req, res) => {
+    const { artworkId } = req.params;
+    const artwork = await Artwork.findByIdAndUpdate(
+        artworkId,
+        { $inc: { shares: 1 } },
+        { new: true }
+    );
+    if (!artwork) throw new ApiError(404, "Artwork not found");
+    
+    return res.status(200).json(new ApiResponse(200, { shares: artwork.shares }, "Share count incremented"));
+});
+
 export {
     uploadArtwork,
     getFeed,
@@ -165,4 +178,5 @@ export {
     addComment,
     getArtworksByOwner,
     getMyLikedArtworks,
+    incrementShare,
 };

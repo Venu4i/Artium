@@ -9,6 +9,7 @@ import {
   addComment,
   getArtworksByOwner,
   getMyLikedArtworks,
+  incrementShare,
 } from "../controllers/artwork.controller.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.get("/my-likes", verifyJWT, getMyLikedArtworks);
 router.get("/:artworkId", verifyJWT, getArtworkById);
 router.post("/:artworkId/like", verifyJWT, toggleLikeArtwork);
 router.post("/:artworkId/comments", verifyJWT, addComment);
+router.post("/:artworkId/share", verifyJWT, incrementShare);
 
 export default router;

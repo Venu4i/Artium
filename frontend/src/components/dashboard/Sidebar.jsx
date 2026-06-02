@@ -3,10 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
 import {
-    HomeIcon, UserIcon, CloudArrowUpIcon, UserGroupIcon,
-    TrophyIcon, Cog6ToothIcon, XMarkIcon,
-    ChatBubbleLeftRightIcon // Added for Chat
+    HomeIcon, CloudArrowUpIcon, UserGroupIcon,
+    XMarkIcon,
+    ChatBubbleLeftRightIcon, ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../../hooks/useAuth';
 
 // 1. IMPROVED NAV ITEM
 const NavItem = ({ icon: Icon, label, to, onClick }) => {
@@ -14,105 +15,92 @@ const NavItem = ({ icon: Icon, label, to, onClick }) => {
     const isActive = location.pathname === to;
 
     return (
-        <Link to={to} onClick={onClick} className="block">
+        <Link to={to} onClick={onClick} className="block mb-1">
             <motion.div
                 whileTap={{ scale: 0.95 }}
-                className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-out border ${
+                className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                     isActive
-                        ? "bg-violet-600/10 text-violet-400 border-violet-500/20 shadow-[0_0_15px_-3px_rgba(124,58,237,0.3)]"
-                        : "text-slate-400 border-transparent hover:bg-white/5 hover:text-white"
+                        ? "bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white font-medium translate-x-1"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50"
                 }`}
             >
-                {isActive && (
-                    <div className="absolute left-0 h-6 w-1 bg-violet-500 rounded-r-full shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
-                )}
-
                 <Icon 
-                    className={`w-5 h-5 transition-colors duration-300 ${
-                        isActive ? "text-violet-400" : "text-slate-500 group-hover:text-slate-200"
+                    className={`w-5 h-5 transition-colors duration-200 ${
+                        isActive ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400"
                     }`} 
                 />
-                <span className="font-medium text-sm">{label}</span>
+                <span className={`${isActive ? 'font-medium' : ''} text-sm`}>{label}</span>
             </motion.div>
         </Link>
     );
 };
 
+// 2. ACTION ITEM (For Buttons like Logout)
+const ActionItem = ({ icon: Icon, label, onClick }) => {
+    return (
+        <button onClick={onClick} className="block w-full text-left">
+            <motion.div
+                whileTap={{ scale: 0.95 }}
+                className="group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-out border text-slate-400 border-transparent hover:bg-rose-500/10 hover:text-rose-400"
+            >
+                <Icon className="w-5 h-5 transition-colors duration-300 text-slate-500 group-hover:text-rose-400" />
+                <span className="font-medium text-sm">{label}</span>
+            </motion.div>
+        </button>
+    );
+};
+
 // Reusable Content
 const NavContent = ({ user, closeMobileMenu }) => {
-    // Calculate total likes across all user posts
-    const totalLikes = useMemo(() => {
-        if (!user?.posts) return 0;
-        return user.posts.reduce((acc, post) => acc + (post.likes?.length || 0), 0);
-    }, [user]);
+    const { logout } = useAuth();
 
     return (
         <div className="flex flex-col h-full">
             {/* Brand */}
-            <div className="flex items-center justify-between px-2 mb-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-400 flex items-center justify-center text-white font-bold shadow-lg shadow-violet-900/20">
-                        A
-                    </div>
-                    <span className="text-xl font-bold tracking-tight text-white">ArtistConnect</span>
+            <div className="mb-6 px-4 pt-2 flex items-center justify-between">
+                <div>
+                    <h2 className="font-display text-xl font-black text-slate-900 dark:text-white">Creative Prism</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Artist Workspace</p>
                 </div>
-
+                
                 {closeMobileMenu && (
-                    <button onClick={closeMobileMenu} className="p-1 text-slate-400 hover:text-white md:hidden transition-colors">
+                    <button onClick={closeMobileMenu} className="p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white md:hidden transition-colors">
                         <XMarkIcon className="w-6 h-6" />
                     </button>
                 )}
             </div>
 
             {/* Navigation */}
-            <nav className="space-y-1 flex-1">
-                <NavItem to="/feed" icon={HomeIcon} label="Home" onClick={closeMobileMenu} />
+            <nav className="flex flex-col gap-2 flex-grow overflow-y-auto drawer-scroll pr-2 pb-20">
+                <NavItem to="/feed" icon={HomeIcon} label="Discover" onClick={closeMobileMenu} />
                 <NavItem to="/chat" icon={ChatBubbleLeftRightIcon} label="Messages" onClick={closeMobileMenu} />
-                <NavItem to="/profile" icon={UserIcon} label="Profile" onClick={closeMobileMenu} />
                 
-                {/* Community Section */}
-                <NavItem to="/communities" icon={UserGroupIcon} label="Explore Hubs" onClick={closeMobileMenu} />
-                <NavItem to="/my-communities" icon={UserGroupIcon} label="My Communities" onClick={closeMobileMenu} />
-                
-                <NavItem to="/upload" icon={CloudArrowUpIcon} label="Upload" onClick={closeMobileMenu} />
-                <NavItem to="/challenges" icon={TrophyIcon} label="Challenges" onClick={closeMobileMenu} />
-                <NavItem to="/settings" icon={Cog6ToothIcon} label="Settings" onClick={closeMobileMenu} />
+                <div className="pt-4 pb-1">
+                    <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Communities</p>
+                </div>
+                <NavItem to="/communities" icon={UserGroupIcon} label="Hubs" onClick={closeMobileMenu} />
+                <NavItem to="/my-communities" icon={UserGroupIcon} label="Guilds" onClick={closeMobileMenu} />
             </nav>
 
-        {/* Stats Card */}
-        {user && (
-            <div className="mt-auto pt-6">
-                <div className="p-5 rounded-2xl bg-slate-800/40 border border-white/5 backdrop-blur-md">
-                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Your Stats</h4>
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-500">Followers</span>
-                            <span className="text-white font-bold">{user?.followers?.length ?? 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-500">Following</span>
-                            <span className="text-white font-bold">{user?.following?.length ?? 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-500">Artworks</span>
-                            <span className="text-white font-bold">{user?.posts?.length ?? 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-500">Likes</span>
-                            <span className="text-violet-400 font-bold">{user?.likedPosts?.length ?? 0}</span>
-                        </div>
-                    </div>
-                </div>
+            {/* Upload Button at Bottom */}
+            <div className="mt-auto">
+                <Link to="/upload" onClick={closeMobileMenu}>
+                    <motion.button 
+                        whileTap={{ scale: 0.95 }}
+                        className="w-full mt-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                    >
+                        Upload
+                    </motion.button>
+                </Link>
             </div>
-        )}
-    </div>
-);
-}
+        </div>
+    );
+};
 
 const Sidebar = ({ user, mobileOpen, setMobileOpen }) => {
     return (
         <>
-            <aside className="w-64 flex-shrink-0 flex-col p-6 border-r border-white/5 bg-slate-900/50 backdrop-blur-sm hidden md:flex h-screen sticky top-0">
+            <aside className="hidden md:flex fixed left-4 top-24 bottom-4 w-64 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-xl flex-col gap-2 p-4 transition-colors duration-300 z-40">
                 <NavContent user={user} />
             </aside>
 

@@ -99,14 +99,14 @@ const ArtworkModal = ({
       <Dialog as="div" className="relative z-50" onClose={closeModal}>
         <Transition.Child
           as={React.Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+          enter="ease-out duration-500"
+          enterFrom="opacity-0 backdrop-blur-none"
+          enterTo="opacity-100 backdrop-blur-xl"
+          leave="ease-in duration-300"
+          leaveFrom="opacity-100 backdrop-blur-xl"
+          leaveTo="opacity-0 backdrop-blur-none"
         >
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-slate-950/80 transition-all" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -120,23 +120,27 @@ const ArtworkModal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl h-[90vh] md:h-[85vh] transform overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl flex flex-col md:flex-row">
+              <Dialog.Panel className="w-full max-w-5xl h-[90vh] md:h-[85vh] transform overflow-hidden rounded-3xl bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row relative">
+                
+                {/* Glowing Orbs behind the modal content */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-violet-600/20 rounded-full blur-[100px] pointer-events-none -z-10" />
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-cyan-600/20 rounded-full blur-[100px] pointer-events-none -z-10" />
 
-                <div className="w-full md:w-2/3 h-[40%] md:h-full bg-black flex items-center justify-center relative">
+                <div className="w-full md:w-2/3 h-[40%] md:h-full bg-black/40 flex items-center justify-center relative p-2 md:p-6">
                   <img
                     src={artwork.image}
                     alt={artwork.title}
-                    className="max-h-full max-w-full object-contain"
+                    className="max-h-full max-w-full object-contain rounded-xl shadow-2xl"
                   />
                   <button
                     onClick={closeModal}
-                    className="absolute top-4 left-4 p-2 bg-black/50 rounded-full text-white hover:bg-white/20 md:hidden z-10"
+                    className="absolute top-4 left-4 p-2 bg-black/50 backdrop-blur-md rounded-full text-white/70 hover:text-white hover:bg-white/20 md:hidden z-10 transition-colors"
                   >
                     <XMarkIcon className="w-6 h-6" />
                   </button>
                 </div>
 
-                <div className="w-full md:w-1/3 h-[60%] md:h-full bg-slate-900 border-t md:border-t-0 md:border-l border-white/5 flex flex-col">
+                <div className="w-full md:w-1/3 h-[60%] md:h-full border-t md:border-t-0 md:border-l border-white/5 flex flex-col bg-slate-900/50 backdrop-blur-3xl relative z-10">
 
                   <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
@@ -151,62 +155,62 @@ const ArtworkModal = ({
                           <motion.button
                             onClick={handleFollow}
                             disabled={following}
-                            className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors disabled:opacity-60 ${
+                            className={`text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full transition-all disabled:opacity-60 border ${
                               isFollowingOwner
-                                ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                                : 'bg-violet-600 text-white hover:bg-violet-500'
+                                ? 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                                : 'bg-violet-600/20 text-violet-300 border-violet-500/30 hover:bg-violet-600/40 hover:text-white'
                             }`}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            {isFollowingOwner ? 'Unfollow' : 'Follow'}
+                            {isFollowingOwner ? 'Following' : 'Follow'}
                           </motion.button>
                         )}
                       </div>
                     </div>
                     <button
                       onClick={closeModal}
-                      className="text-slate-500 hover:text-white hidden md:block"
+                      className="text-slate-500 hover:text-white hidden md:block transition-colors p-1 hover:bg-white/5 rounded-full"
                     >
-                      <XMarkIcon className="w-6 h-6" />
+                      <XMarkIcon className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
+                  <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 drawer-scroll">
                     <div>
-                      <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{artwork.title}</h2>
-                      <p className="text-sm text-slate-300 leading-relaxed">{artwork.description || ''}</p>
+                      <h2 className="text-xl md:text-3xl font-bold text-white mb-2 tracking-tight">{artwork.title}</h2>
+                      <p className="text-sm text-slate-400 leading-relaxed font-light">{artwork.description || ''}</p>
                       <div className="flex flex-wrap gap-2 mt-4">
                         {artwork.tags?.map((tag, i) => (
                           <span
                             key={i}
-                            className="px-2 py-1 text-xs rounded bg-slate-800 text-slate-400 border border-white/5"
+                            className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-full bg-white/5 text-slate-300 border border-white/10"
                           >
-                            #{tag}
+                            {tag}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="border-t border-white/5 pt-4 flex flex-col min-h-0">
-                      <h4 className="text-sm font-bold text-white mb-3">Comments ({comments.length})</h4>
+                    <div className="border-t border-white/10 pt-6 flex flex-col min-h-0">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Comments ({comments.length})</h4>
                       <div
-                        className="flex-1 min-h-[120px] max-h-[200px] overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent"
+                        className="flex-1 overflow-y-auto space-y-4 pr-2 drawer-scroll"
                         style={{ overflowY: 'auto' }}
                       >
                         {comments.length === 0 ? (
                           <p className="text-center text-slate-500 text-xs py-4">No comments yet. Be the first!</p>
                         ) : (
                           comments.map((c, i) => (
-                            <div key={i} className="flex gap-2 text-sm">
+                            <div key={i} className="flex gap-3 text-sm">
                               <img
                                 src={c.user?.profilePicture}
                                 alt=""
-                                className="w-6 h-6 rounded-full flex-shrink-0"
+                                className="w-8 h-8 rounded-full flex-shrink-0 border border-white/10"
                               />
-                              <div>
-                                <span className="font-medium text-white">{c.user?.username}</span>
-                                <span className="text-slate-400 ml-1">{c.text}</span>
+                              <div className="bg-white/5 p-3 rounded-2xl rounded-tl-sm w-full border border-white/5">
+                                <span className="font-bold text-white block mb-0.5">{c.user?.username}</span>
+                                <span className="text-slate-300 leading-relaxed">{c.text}</span>
                               </div>
                             </div>
                           ))
@@ -216,45 +220,47 @@ const ArtworkModal = ({
                     </div>
                   </div>
 
-                  <div className="p-4 border-t border-white/5 bg-slate-900/50 flex-shrink-0">
+                  <div className="p-4 border-t border-white/10 bg-slate-900/80 flex-shrink-0 backdrop-blur-xl">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex gap-4">
+                      <div className="flex gap-6">
                         <motion.button
                           onClick={handleLike}
                           disabled={liking}
-                          className="flex items-center gap-1.5 text-white hover:text-pink-500 transition-colors focus:outline-none disabled:opacity-60"
+                          className={`flex items-center gap-2 transition-colors focus:outline-none disabled:opacity-60 ${
+                            liked ? 'text-rose-500' : 'text-slate-400 hover:text-white'
+                          }`}
                           whileTap={{ scale: 0.9 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                         >
                           {liked ? (
-                            <HeartSolid className="w-6 h-6 text-pink-500" />
+                            <HeartSolid className="w-6 h-6" />
                           ) : (
                             <HeartIcon className="w-6 h-6" />
                           )}
-                          <span className="text-sm font-medium">{likeCount}</span>
+                          <span className="text-sm font-semibold">{likeCount}</span>
                         </motion.button>
-                        <span className="flex items-center gap-1.5 text-slate-400">
+                        <span className="flex items-center gap-2 text-slate-400">
                           <ChatBubbleLeftIcon className="w-6 h-6" />
-                          <span className="text-sm">{comments.length}</span>
+                          <span className="text-sm font-semibold">{comments.length}</span>
                         </span>
-                        <button className="text-white hover:text-slate-300">
+                        <button className="text-slate-400 hover:text-white transition-colors">
                           <ShareIcon className="w-6 h-6" />
                         </button>
                       </div>
                     </div>
 
-                    <form onSubmit={handleComment} className="relative">
+                    <form onSubmit={handleComment} className="relative mt-2">
                       <input
                         type="text"
                         placeholder="Add a comment..."
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        className="w-full bg-slate-800 border border-white/10 rounded-full py-2.5 pl-4 pr-12 text-sm text-white focus:outline-none focus:border-violet-500"
+                        className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-5 pr-12 text-sm text-white focus:outline-none focus:border-violet-500/50 focus:bg-white/10 transition-all placeholder:text-slate-500"
                       />
                       <button
                         type="submit"
                         disabled={!commentText.trim() || commenting}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-violet-400 hover:text-violet-300 px-2 disabled:opacity-50"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-white bg-violet-600 px-3 py-1.5 rounded-full hover:bg-violet-500 disabled:opacity-50 transition-colors"
                       >
                         {commenting ? '...' : 'Post'}
                       </button>

@@ -5,13 +5,15 @@ import { setCredentials, logout, setCheckingAuth } from "./store/authSlice";
 import api from "./api/axios";
 
 // Providers
-import { SocketProvider } from "./context/SocketContext"; // 👈 Added SocketProvider
+import { SocketProvider } from "./context/SocketContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 // Components
 import AuthPage from "./pages/AuthPage";
 import MainLayout from "./layout/MainLayout";
 import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import UploadPage from "./pages/UploadPage";
 import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 import ExploreCommunities from "./pages/ExploreCommunities";
@@ -30,9 +32,11 @@ const ProtectedLayout = () => {
   // Wrap the MainLayout in SocketProvider so chat works everywhere 
   // while the user is logged in
   return (
-    <SocketProvider>
-      <MainLayout />
-    </SocketProvider>
+    <ThemeProvider>
+      <SocketProvider>
+        <MainLayout />
+      </SocketProvider>
+    </ThemeProvider>
   );
 };
 
@@ -84,6 +88,7 @@ function App() {
           <Route path="/feed" element={<FeedPage />} />
           
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           
           <Route path="/upload" element={<UploadPage />} />
 

@@ -5,10 +5,12 @@ import { LinkIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import FeedCard from '../components/dashboard/FeedCard';
 import ArtworkModal from '../components/dashboard/ArtworkModal';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const ProfilePage = () => {
   const { currentUser, refreshUser } = useOutletContext();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,15 +58,23 @@ const ProfilePage = () => {
     }
   }, [user?._id, activeTab]);
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>;
-  if (error) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-red-500">{error}</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-slate-400">Loading...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-20 md:pb-0">
+    <div className="min-h-screen text-slate-200 pb-20 md:pb-0">
 
       {/* 1. HEADER / COVER IMAGE */}
-      {/* RESPONSIVE: h-48 on mobile, h-64 on desktop */}
       <div className="relative h-48 md:h-64 w-full bg-slate-900 overflow-hidden group">
+        
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 z-10 p-2 bg-black/30 backdrop-blur-md rounded-full text-white hover:bg-black/50 transition-colors"
+        >
+          <ArrowLeftIcon className="w-5 h-5" />
+        </button>
+
         <img
           src={user?.coverImage || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"}
           alt="Cover"
@@ -147,6 +157,29 @@ const ProfilePage = () => {
                 <span className="text-sm text-slate-300 truncate">Portfolio Website</span>
               </a>
             )}
+            
+            {/* Stats Card moved from Sidebar */}
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md mt-2">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Your Stats</h4>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-500 font-medium">Followers</span>
+                        <span className="text-white font-bold">{user?.followers?.length ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-500 font-medium">Following</span>
+                        <span className="text-white font-bold">{user?.following?.length ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-500 font-medium">Artworks</span>
+                        <span className="text-white font-bold">{user?.posts?.length ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-500 font-medium">Likes</span>
+                        <span className="text-violet-400 font-bold">{user?.likedPosts?.length ?? 0}</span>
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
 

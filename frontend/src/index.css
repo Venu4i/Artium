@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --font-headline: "Public Sans", sans-serif;
+  --font-display: "Public Sans", sans-serif;
+  --font-body: "Public Sans", sans-serif;
+  --font-label: "Public Sans", sans-serif;
+}
+
 @layer base {
   body {
-    @apply bg-zinc-950 text-slate-100 antialiased;
-    overflow: hidden; /* Prevent double scrollbars on the main page */
+    @apply antialiased;
   }
 }
 
@@ -24,6 +30,54 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-zinc-800 rounded-full hover:bg-violet-600 transition-colors;
+  }
+
+  .drawer-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .drawer-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .drawer-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 20px;
+  }
+
+  /* Global Mesh Backgrounds */
+  .bg-mesh-dark {
+    @apply bg-neutral-950 text-slate-100 relative overflow-hidden;
+  }
+  .bg-mesh-dark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: 
+      radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15), transparent 25%);
+    filter: blur(40px);
+    animation: mesh-pulse 10s ease-in-out infinite alternate;
+  }
+  
+  .bg-mesh-light {
+    @apply bg-slate-50 text-slate-900 relative overflow-hidden;
+  }
+  .bg-mesh-light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: 
+      radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.1), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.1), transparent 25%);
+    filter: blur(40px);
+    animation: mesh-pulse 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes mesh-pulse {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+    50% { transform: scale(1.1) translate(2%, 2%); opacity: 1; }
+    100% { transform: scale(0.95) translate(-2%, -2%); opacity: 0.8; }
   }
 
   /* Vibrant Glows */
