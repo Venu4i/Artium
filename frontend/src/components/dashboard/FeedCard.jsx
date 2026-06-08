@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -85,7 +86,7 @@ const FeedCard = ({ artwork, index, onClick, onLike, disabledLike, onCommentClic
 
     return (
         <article 
-            className="masonry-item break-inside-avoid mb-4 md:mb-6 group relative bg-white dark:bg-zinc-900/80 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-visible transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer"
+            className="masonry-item break-inside-avoid mb-4 md:mb-6 group relative bg-white dark:bg-zinc-900/80 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-visible transition-all duration-300 hover:-translate-y-1 cursor-pointer"
             onClick={() => onClick(artwork)}
         >
             <div className="relative overflow-hidden rounded-t-2xl">

@@ -1,17 +1,15 @@
 import Challenge from "../models/Challenge.model.js";
 import Community from "../models/Community.model.js";
 import User from "../models/User.model.js";
+import Submission from "../models/Submission.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 
-/**
- * @description Admin creates a new challenge for a community
- * @route POST /api/v1/challenges/:communityId
- */
+// 1. Admin Creates Challenge
 export const createChallenge = async (req, res) => {
     const { communityId } = req.params;
-    const { title, description, deadline, rewardPoints } = req.body;
+    const { title, description, deadline, maxPoints, mediaTypeAccepted } = req.body;
 
     if (!title || !description || !deadline) {
         throw new ApiError(400, "Title, description, and deadline are required");
@@ -20,7 +18,6 @@ export const createChallenge = async (req, res) => {
     const community = await Community.findById(communityId);
     if (!community) throw new ApiError(404, "Community not found");
 
-    // Authorization: Only the community admin can create challenges
     if (community.admin.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "Unauthorized: Only the admin can create challenges");
     }
@@ -31,117 +28,196 @@ export const createChallenge = async (req, res) => {
         community: communityId,
         createdBy: req.user._id,
         deadline: new Date(deadline),
-        rewardPoints: Number(rewardPoints) || 10,
-        bannerImage: req.file?.path || "" 
+        mediaTypeAccepted: mediaTypeAccepted || "any",
+        maxPoints: Number(maxPoints) || 100,
+        status: "ACTIVE"
     });
 
-    return res
-        .status(201)
-        .json(new ApiResponse(201, challenge, "Challenge created successfully"));
+    if (req.io) {
+        req.io.to(communityId.toString()).emit("challenge:new", challenge);
+    }
+
+    return res.status(201).json(new ApiResponse(201, challenge, "Challenge created successfully"));
 };
 
-/**
- * @description User submits content to a challenge and earns points
- * @route POST /api/v1/challenges/:challengeId/submit
- */
+// 2. Members Submit
 export const submitToChallenge = async (req, res) => {
     const { challengeId } = req.params;
     const userId = req.user._id;
+    const { mediaUrl, contentId } = req.body;
 
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) throw new ApiError(404, "Challenge not found");
 
-    // 1. Check if the challenge is still active
-    if (new Date() > new Date(challenge.deadline)) {
-        throw new ApiError(400, "This challenge has expired");
+    if (challenge.status !== "ACTIVE" || new Date() > new Date(challenge.deadline)) {
+        throw new ApiError(400, "Submissions are closed for this challenge");
     }
 
-    // 2. Check if user already submitted (Prevent point farming)
-    const existingSubmission = challenge.submissions.find(
-        (s) => s.user.toString() === userId.toString()
-    );
-    if (existingSubmission) {
-        throw new ApiError(400, "You have already completed this challenge");
-    }
-
-    // 3. Update the Challenge Submissions 
-    // (In a real app, you'd create an Artwork/Post document first and use that ID)
-    challenge.submissions.push({
-        user: userId,
-        content: new mongoose.Types.ObjectId(), // Placeholder for Artwork ID
-        submittedAt: new Date()
+    const existingSubmission = await Submission.findOne({
+        challengeId,
+        submittedBy: userId
     });
+
+    if (existingSubmission) {
+        throw new ApiError(400, "You have already submitted to this challenge");
+    }
+
+    const submission = await Submission.create({
+        submittedBy: userId,
+        communityId: challenge.community,
+        challengeId,
+        mediaUrl: mediaUrl || "",
+        content: contentId || null,
+        status: "pending"
+    });
+
+    return res.status(201).json(new ApiResponse(201, submission, "Submission successful"));
+};
+
+// 3. Admin Closes Submissions Manually
+export const closeSubmissions = async (req, res) => {
+    const { challengeId } = req.params;
+
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) throw new ApiError(404, "Challenge not found");
+
+    const community = await Community.findById(challenge.community);
+    if (community.admin.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized");
+    }
+
+    challenge.status = "SUBMISSION_CLOSED";
     await challenge.save();
 
-    // 4. Update User Profile: Add points and track completion
-    const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        {
-            $inc: { points: challenge.rewardPoints },
-            $addToSet: { completedChallenges: challenge._id } 
-        },
-        { new: true }
-    ).select("username points completedChallenges");
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, updatedUser, "Challenge completed! Points awarded."));
+    return res.status(200).json(new ApiResponse(200, challenge, "Submissions closed, review can begin"));
 };
 
-/**
- * @description Get all challenges for a specific community
- * @route GET /api/v1/challenges/community/:communityId
- */
-export const getCommunityChallenges = async (req, res) => {
-    const { communityId } = req.params;
+// 4. Admin Reviews a Submission
+export const reviewSubmission = async (req, res) => {
+    const { submissionId } = req.params;
+    const { status, pointsAwarded, rejectionNote } = req.body;
 
-    const challenges = await Challenge.find({ community: communityId })
-        .sort({ createdAt: -1 })
-        .select("-submissions"); // Hide submissions for the list view
+    if (!["approved", "rejected"].includes(status)) {
+        throw new ApiError(400, "Status must be 'approved' or 'rejected'");
+    }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, challenges, "Challenges retrieved successfully"));
+    const submission = await Submission.findById(submissionId).populate("challengeId");
+    if (!submission) throw new ApiError(404, "Submission not found");
+
+    const community = await Community.findById(submission.communityId);
+    if (community.admin.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized");
+    }
+
+    submission.status = status;
+    
+    if (status === "approved") {
+        const maxPoints = submission.challengeId.maxPoints;
+        const awarded = Number(pointsAwarded) || 0;
+        submission.pointsAwarded = awarded > maxPoints ? maxPoints : awarded;
+        submission.rejectionNote = "";
+    } else {
+        submission.pointsAwarded = 0;
+        submission.rejectionNote = rejectionNote || "";
+    }
+
+    await submission.save();
+
+    return res.status(200).json(new ApiResponse(200, submission, "Submission reviewed"));
 };
 
-/**
- * @description Get challenge details and current submissions
- * @route GET /api/v1/challenges/:challengeId
- */
+// 5. Admin Finalizes Challenge
+export const finalizeChallenge = async (req, res) => {
+    const { challengeId } = req.params;
+
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) throw new ApiError(404, "Challenge not found");
+
+    if (challenge.status === "FINALIZED") {
+        throw new ApiError(400, "Challenge is already finalized");
+    }
+
+    const community = await Community.findById(challenge.community);
+    if (community.admin.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized");
+    }
+
+    const pendingSubmissions = await Submission.find({ challengeId, status: "pending" });
+    if (pendingSubmissions.length > 0) {
+        throw new ApiError(400, "All submissions must be reviewed before finalizing");
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const approvedSubmissions = await Submission.find({ challengeId, status: "approved" }).session(session);
+
+        for (const sub of approvedSubmissions) {
+            const points = sub.pointsAwarded;
+            const userId = sub.submittedBy;
+
+            await User.findByIdAndUpdate(
+                userId,
+                {
+                    $inc: {
+                        "points.global": points,
+                        [`points.communities.${community._id}`]: points
+                    },
+                    $addToSet: { completedChallenges: challenge._id }
+                },
+                { session }
+            );
+
+            if (req.io) {
+                req.io.to(userId.toString()).emit("submission:reviewed", sub);
+            }
+        }
+
+        const rejectedSubmissions = await Submission.find({ challengeId, status: "rejected" }).session(session);
+        for (const sub of rejectedSubmissions) {
+            if (req.io) {
+                req.io.to(sub.submittedBy.toString()).emit("submission:reviewed", sub);
+            }
+        }
+
+        challenge.status = "FINALIZED";
+        await challenge.save({ session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (req.io) {
+            req.io.to(community._id.toString()).emit("challenge:finalized", challenge);
+        }
+
+        return res.status(200).json(new ApiResponse(200, challenge, "Challenge finalized and points awarded"));
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new ApiError(500, "Failed to finalize challenge: " + error.message);
+    }
+};
+
 export const getChallengeDetails = async (req, res) => {
     const { challengeId } = req.params;
 
     const challenge = await Challenge.findById(challengeId)
-        .populate("submissions.user", "username profilePicture")
-        .populate("createdBy", "username");
+        .populate("createdBy", "username profilePicture");
 
     if (!challenge) throw new ApiError(404, "Challenge not found");
+    
+    const submissions = await Submission.find({ challengeId }).populate("submittedBy", "username profilePicture");
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, challenge, "Challenge details retrieved"));
+    return res.status(200).json(new ApiResponse(200, { challenge, submissions }, "Challenge details retrieved"));
 };
 
-/**
- * @description Get leaderboard based on total user points
- * @route GET /api/v1/challenges/:challengeId/leaderboard
- */
-export const getChallengeLeaderboard = async (req, res) => {
-    const { challengeId } = req.params;
+export const getCommunityChallenges = async (req, res) => {
+    const { communityId } = req.params;
 
-    const challenge = await Challenge.findById(challengeId);
-    if (!challenge) throw new ApiError(404, "Challenge not found");
+    const challenges = await Challenge.find({ community: communityId })
+        .sort({ createdAt: -1 });
 
-    // Fetch users who submitted to this challenge, sorted by their total points
-    // Note: You can also sort by a community-specific score if you implemented that
-    const participants = await User.find({
-        completedChallenges: challengeId
-    })
-    .sort({ points: -1 })
-    .limit(20)
-    .select("username avatar points");
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, participants, "Leaderboard retrieved successfully"));
+    return res.status(200).json(new ApiResponse(200, challenges, "Challenges retrieved successfully"));
 };

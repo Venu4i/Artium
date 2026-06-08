@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const challengeSchema = new mongoose.Schema(
     {
         title: { type: String, required: true, trim: true },
@@ -17,21 +16,13 @@ const challengeSchema = new mongoose.Schema(
         },
         // bannerImage: { type: String },
         deadline: { type: Date, required: true },
-        rewardPoints: { type: Number, default: 10 }, // Points awarded on completion
-        
-        // Track submissions
-        submissions: [
-            {
-                user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-                content: { type: mongoose.Schema.Types.ObjectId, ref: "Artwork" }, // Link to the post/artwork uploaded
-                submittedAt: { type: Date, default: Date.now }
-            }
-        ],
+        mediaTypeAccepted: { type: String, default: "any" }, // e.g., "image", "audio", "video", "text", "any"
+        maxPoints: { type: Number, required: true, default: 100 },
         
         status: {
             type: String,
-            enum: ["active", "completed", "archived"],
-            default: "active"
+            enum: ["DRAFT", "ACTIVE", "SUBMISSION_CLOSED", "REVIEW_IN_PROGRESS", "FINALIZED"],
+            default: "ACTIVE"
         }
     },
     { timestamps: true }

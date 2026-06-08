@@ -1,15 +1,64 @@
 @import "tailwindcss";
 
 @theme {
-  --font-headline: "Public Sans", sans-serif;
-  --font-display: "Public Sans", sans-serif;
-  --font-body: "Public Sans", sans-serif;
-  --font-label: "Public Sans", sans-serif;
+  --font-headline: "Hanken Grotesk", sans-serif;
+  --font-display: "Hanken Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-data-mono: "JetBrains Mono", monospace;
+  
+  --color-community-surface: var(--community-surface);
+  --color-community-surface-dim: var(--community-surface-dim);
+  --color-community-background: var(--community-background);
+  --color-community-primary: var(--community-primary);
+  --color-community-secondary: var(--community-secondary);
+  --color-community-tertiary: var(--community-tertiary);
+  --color-community-on-surface: var(--community-on-surface);
+  --color-community-on-surface-variant: var(--community-on-surface-variant);
+  --color-community-outline: var(--community-outline);
+  --color-community-container-highest: var(--community-container-highest);
+  --color-community-container-lowest: var(--community-container-lowest);
+  
+  --spacing-stack-sm: 4px;
+  --spacing-container-padding-mobile: 16px;
+  --spacing-container-padding-desktop: 40px;
+  --spacing-gutter: 24px;
+  --spacing-stack-md: 12px;
+  --spacing-stack-lg: 24px;
 }
 
 @layer base {
   body {
     @apply antialiased;
+  }
+  
+  :root {
+    /* Light Theme variants for Community UI */
+    --community-surface: #ffffff;
+    --community-surface-dim: #f3f4f6;
+    --community-background: #f9fafb;
+    --community-primary: #4f46e5;
+    --community-secondary: #e11d48;
+    --community-tertiary: #0ea5e9;
+    --community-on-surface: #111827;
+    --community-on-surface-variant: #4b5563;
+    --community-outline: #d1d5db;
+    --community-container-highest: #e5e7eb;
+    --community-container-lowest: #ffffff;
+  }
+
+  .dark {
+    /* Dark Theme variants from Stitch HTML */
+    --community-surface: #131316;
+    --community-surface-dim: #131316;
+    --community-background: #131316;
+    --community-primary: #c8c6c8;
+    --community-secondary: #ffb0cd;
+    --community-tertiary: #4cd7f6;
+    --community-on-surface: #e4e1e6;
+    --community-on-surface-variant: #c8c5ca;
+    --community-outline: #919095;
+    --community-container-highest: #353438;
+    --community-container-lowest: #0e0e11;
   }
 }
 
@@ -41,6 +90,32 @@
   .drawer-scroll::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.5);
     border-radius: 20px;
+  }
+
+  /* Hide scrollbar completely */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* Community specific components from HTML */
+  .glass-panel {
+    @apply bg-white/60 dark:bg-[#1b1b1e]/60 backdrop-blur-[24px] border border-white/80 dark:border-white/5 shadow-md dark:shadow-none;
+  }
+  
+  .glass-card-community {
+    @apply bg-white/80 dark:bg-[#1f1f22]/80 backdrop-blur-md border border-white/80 dark:border-white/5 shadow-sm dark:shadow-none;
+  }
+  
+  .admin-gradient {
+    @apply bg-gradient-to-br from-community-secondary/80 to-[#aa0266]/80;
+  }
+  
+  .ambient-glow-secondary {
+    @apply shadow-[0_0_15px_rgba(255,176,205,0.15)];
   }
 
   /* Global Mesh Backgrounds */
@@ -87,5 +162,31 @@
   
   .glow-cyan {
     @apply shadow-[0_0_15px_rgba(34,211,238,0.3)];
+  }
+
+  /* Premium Animated Background Blob Utilities */
+  .animate-blob {
+    animation: blob 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
   }
 }

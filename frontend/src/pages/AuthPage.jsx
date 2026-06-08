@@ -5,6 +5,7 @@ import api from "../api/axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import PremiumBackground from '../components/PremiumBackground';
 
 const slides = [
   {
@@ -94,6 +95,7 @@ export default function AuthPage() {
 
   return (
     <div className="flex min-h-screen w-full relative bg-[#09090b] text-[#e8dfee] font-sans antialiased overflow-x-hidden selection:bg-[#d2bbff]/30 selection:text-[#d2bbff]">
+      <PremiumBackground />
       
       {/* Left Pane: Immersive Hero Image Slideshow */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-16 overflow-hidden border-r border-white/5 bg-black">
@@ -144,9 +146,6 @@ export default function AuthPage() {
 
       {/* Right Pane: Glassmorphic Form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-10 lg:p-16 relative">
-        {/* Ambient Glow Effects */}
-        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-[#d2bbff]/20 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-[#4cd7f6]/10 rounded-full blur-[80px] pointer-events-none"></div>
 
         {/* Main Form Card */}
         <div className="w-full max-w-[480px] relative z-10">

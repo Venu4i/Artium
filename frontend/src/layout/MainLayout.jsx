@@ -5,6 +5,7 @@ import TopBar from '../components/dashboard/TopBar';
 import api from '../api/axios';
 import { useTheme } from '../context/ThemeContext';
 import { useLocation } from 'react-router-dom';
+import PremiumBackground from '../components/PremiumBackground';
 
 const MainLayout = () => {
     const [currentUser, setCurrentUser] = useState(null);
@@ -30,16 +31,9 @@ const MainLayout = () => {
     }, [fetchUser]);
 
     return (
-        <div className={`min-h-screen font-body selection:bg-[#d2bbff]/30 selection:text-[#d2bbff] transition-colors duration-500 ${
-            theme === 'dark' ? 'bg-[#09090b] text-[#e8dfee]' : 'bg-slate-50 text-slate-900'
-        }`}>
-            {/* Ambient Glow Effects from Auth Page (Dark Mode Only) */}
-            {theme === 'dark' && (
-                <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                    <div className="absolute top-1/4 -right-20 w-96 h-96 bg-[#d2bbff]/20 rounded-full blur-[100px]"></div>
-                    <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-[#4cd7f6]/10 rounded-full blur-[80px]"></div>
-                </div>
-            )}
+        <div className={`min-h-screen font-body selection:bg-[#d2bbff]/30 selection:text-[#d2bbff] transition-colors duration-500 text-[#e8dfee]`}>
+            
+            <PremiumBackground />
 
             {!hideNavigation && (
                 <TopBar

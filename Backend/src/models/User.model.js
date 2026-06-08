@@ -82,18 +82,16 @@ const userModel = new mongoose.Schema(
 
     // 🏆 Gamification & Progress
     points: { 
-        type: Number, 
-        default: 0 
+        global: { type: Number, default: 0 },
+        communities: {
+            type: Map,
+            of: Number,
+            default: new Map()
+        }
     },
     completedChallenges: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Challenge" 
-    }],
-    
-    // Community-specific points if you want separate leaderboards
-    communityStats: [{
-        community: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
-        points: { type: Number, default: 0 }
     }],
   },
   { timestamps: true }

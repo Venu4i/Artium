@@ -18,7 +18,9 @@ import UploadPage from "./pages/UploadPage";
 import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 import ExploreCommunities from "./pages/ExploreCommunities";
 import MyCommunities from "./pages/MyCommunities";
-import CommunityPage from "./pages/CommunityPage";
+import CommunityPage from "./pages/CommunityPage"; // Legacy, can remove later
+import CommunityLayout from "./layout/CommunityLayout";
+import CommunityWorkspace from "./pages/CommunityWorkspace";
 import AcceptInvite from "./pages/AcceptInvite";
 
 // Protected Route Wrapper
@@ -35,6 +37,23 @@ const ProtectedLayout = () => {
     <ThemeProvider>
       <SocketProvider>
         <MainLayout />
+      </SocketProvider>
+    </ThemeProvider>
+  );
+};
+
+// Community Route Wrapper (Isolated from MainLayout)
+const CommunityRouteWrapper = () => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <ThemeProvider>
+      <SocketProvider>
+        <CommunityLayout />
       </SocketProvider>
     </ThemeProvider>
   );
@@ -95,11 +114,18 @@ function App() {
           {/* --- Chroma Canvas Chat Route --- */}
           <Route path="/chat" element={<ChatPage />} /> 
 
-          {/* --- Community System Routes --- */}
+          {/* --- Community System Routes (Inside MainLayout) --- */}
           <Route path="/communities" element={<ExploreCommunities />} />
           <Route path="/my-communities" element={<MyCommunities />} />
-          <Route path="/community/:id" element={<CommunityPage />} />
           <Route path="/community/invite/:token" element={<AcceptInvite />} />
+        </Route>
+
+        {/* --- Isolated Community Routes (No MainLayout Sidebar/Topbar) --- */}
+        <Route path="/community/:id" element={<CommunityRouteWrapper />}>
+          <Route index element={<Navigate to="workspace" replace />} />
+          <Route path="workspace" element={<CommunityWorkspace />} />
+          <Route path="arena" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Arena (Pending UI)</div>} />
+          <Route path="pantheon" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Pantheon (Pending UI)</div>} />
         </Route>
 
         {/* --- 404 Catch-all --- */}

@@ -1,32 +1,38 @@
-import express from "express";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/upload.js"; 
+import { Router } from "express";
 import {
     createChallenge,
-    getCommunityChallenges,
     submitToChallenge,
-    getChallengeLeaderboard,
-    getChallengeDetails
+    closeSubmissions,
+    reviewSubmission,
+    finalizeChallenge,
+    getChallengeDetails,
+    getCommunityChallenges
 } from "../controllers/challenge.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
-// 🏆 Challenge Management
-// Admin creates a challenge for a specific community
-router.post("/:communityId", verifyJWT, createChallenge);
+router.use(verifyJWT);
 
-// Get all challenges for a specific community
-router.get("/community/:communityId", verifyJWT, getCommunityChallenges);
+// Create Challenge (Admin)
+router.post("/:communityId", createChallenge);
 
-// Get specific details of one challenge
-router.get("/:challengeId", verifyJWT, getChallengeDetails);
+// Get community challenges
+router.get("/community/:communityId", getCommunityChallenges);
 
-// 🎨 Participation
-// User submits their work (requires artwork upload)
-router.post("/:challengeId/submit", verifyJWT, upload.single('artwork'), submitToChallenge);
+// Get single challenge details
+router.get("/:challengeId", getChallengeDetails);
 
-// 📊 Stats & Leaderboard
-// Get leaderboard for a specific challenge or community
-router.get("/:challengeId/leaderboard", verifyJWT, getChallengeLeaderboard);
+// Submit to challenge
+router.post("/:challengeId/submit", submitToChallenge);
+
+// Close submissions (Admin)
+router.put("/:challengeId/close-submissions", closeSubmissions);
+
+// Review submission (Admin)
+router.put("/submission/:submissionId/review", reviewSubmission);
+
+// Finalize challenge (Admin)
+router.put("/:challengeId/finalize", finalizeChallenge);
 
 export default router;
