@@ -103,11 +103,11 @@
 
   /* Community specific components from HTML */
   .glass-panel {
-    @apply bg-white/60 dark:bg-[#1b1b1e]/60 backdrop-blur-[24px] border border-white/80 dark:border-white/5 shadow-md dark:shadow-none;
+    @apply bg-purple-500/15 dark:bg-purple-600/20 backdrop-blur-[24px] border border-purple-500/40 dark:border-purple-600/40 shadow-lg shadow-purple-500/10;
   }
   
   .glass-card-community {
-    @apply bg-white/80 dark:bg-[#1f1f22]/80 backdrop-blur-md border border-white/80 dark:border-white/5 shadow-sm dark:shadow-none;
+    @apply bg-purple-500/15 dark:bg-purple-600/20 backdrop-blur-md border border-purple-500/40 dark:border-purple-600/40 shadow-sm shadow-purple-500/10;
   }
   
   .admin-gradient {
