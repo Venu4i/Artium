@@ -72,14 +72,58 @@ const NavContent = ({ user, closeMobileMenu }) => {
 
             {/* Navigation */}
             <nav className="flex flex-col gap-2 flex-grow overflow-y-auto drawer-scroll pr-2 pb-20">
-                <NavItem to="/feed" icon={HomeIcon} label="Discover" onClick={closeMobileMenu} />
-                <NavItem to="/chat" icon={ChatBubbleLeftRightIcon} label="Messages" onClick={closeMobileMenu} />
-                
+
+                <NavItem
+                    to="/feed"
+                    icon={HomeIcon}
+                    label="Discover"
+                    onClick={closeMobileMenu}
+                />
+
+                <NavItem
+                    to="/chat"
+                    icon={ChatBubbleLeftRightIcon}
+                    label="Messages"
+                    onClick={closeMobileMenu}
+                />
+
+                {/* Communities */}
+
                 <div className="pt-4 pb-1">
-                    <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Communities</p>
+                    <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        Communities
+                    </p>
                 </div>
-                <NavItem to="/communities" icon={UserGroupIcon} label="Hubs" onClick={closeMobileMenu} />
-                <NavItem to="/my-communities" icon={UserGroupIcon} label="Guilds" onClick={closeMobileMenu} />
+
+                <NavItem
+                    to="/communities"
+                    icon={UserGroupIcon}
+                    label="Hubs"
+                    onClick={closeMobileMenu}
+                />
+
+                <NavItem
+                    to="/my-communities"
+                    icon={UserGroupIcon}
+                    label="Guilds"
+                    onClick={closeMobileMenu}
+                />
+
+                {/* AI Studio */}
+
+                <div className="pt-4 pb-1">
+                    <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        AI Studio
+                    </p>
+                </div>
+
+                <NavItem
+                    to="/ai-assistant"
+                    icon={PhotoIcon}
+                    label="Art Mentor"
+                    onClick={closeMobileMenu}
+                />
+
             </nav>
 
             {/* Upload Button at Bottom */}

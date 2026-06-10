@@ -108,6 +108,7 @@ function App() {
           
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/ai-assistant" element={<AiAssistantPage />} />
           
           <Route path="/upload" element={<UploadPage />} />
 
