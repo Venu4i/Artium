@@ -21,6 +21,7 @@ import MyCommunities from "./pages/MyCommunities";
 import CommunityPage from "./pages/CommunityPage"; // Legacy, can remove later
 import CommunityLayout from "./layout/CommunityLayout";
 import CommunityWorkspace from "./pages/CommunityWorkspace";
+import CommunityArena from "./pages/CommunityArena";
 import AcceptInvite from "./pages/AcceptInvite";
 
 // Protected Route Wrapper
@@ -124,7 +125,7 @@ function App() {
         <Route path="/community/:id" element={<CommunityRouteWrapper />}>
           <Route index element={<Navigate to="workspace" replace />} />
           <Route path="workspace" element={<CommunityWorkspace />} />
-          <Route path="arena" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Arena (Pending UI)</div>} />
+          <Route path="arena" element={<CommunityArena />} />
           <Route path="pantheon" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Pantheon (Pending UI)</div>} />
         </Route>
 

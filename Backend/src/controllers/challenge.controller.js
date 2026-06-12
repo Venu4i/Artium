@@ -217,7 +217,28 @@ export const getCommunityChallenges = async (req, res) => {
     const { communityId } = req.params;
 
     const challenges = await Challenge.find({ community: communityId })
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .lean();
 
-    return res.status(200).json(new ApiResponse(200, challenges, "Challenges retrieved successfully"));
+    // Attach submission counts
+    const enrichedChallenges = await Promise.all(
+        challenges.map(async (challenge) => {
+            const count = await Submission.countDocuments({ challengeId: challenge._id });
+            return { ...challenge, submissionsCount: count };
+        })
+    );
+
+    return res.status(200).json(new ApiResponse(200, enrichedChallenges, "Challenges retrieved successfully"));
+};
+
+export const getUserSubmissions = async (req, res) => {
+    const { communityId } = req.params;
+    const userId = req.user._id;
+
+    const submissions = await Submission.find({ 
+        communityId, 
+        submittedBy: userId 
+    }).lean();
+
+    return res.status(200).json(new ApiResponse(200, submissions, "User submissions retrieved"));
 };

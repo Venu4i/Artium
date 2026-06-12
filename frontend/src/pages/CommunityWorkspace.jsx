@@ -144,11 +144,11 @@ const CommunityWorkspace = () => {
                     </div>
                 </div>
 
-                {/* ADMIN CONTROL BAR */}
-                {isAdmin && (
-                    <div className="mt-12 px-4 md:px-10 shrink-0 flex justify-center">
-                        <div className="glass-panel rounded-full px-2 py-2 inline-flex items-center shadow-lg">
-                            <div className="flex items-center justify-center gap-4">
+                {/* CONTROL BAR */}
+                <div className="mt-12 px-4 md:px-10 shrink-0 flex justify-center">
+                    <div className="glass-panel rounded-full px-2 py-2 inline-flex items-center shadow-lg">
+                        <div className="flex items-center justify-center gap-4">
+                            {isAdmin ? (
                                 <button 
                                     onClick={() => setActiveDrawerTab(activeDrawerTab === 'requests' ? null : 'requests')}
                                     className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'requests' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
@@ -156,27 +156,32 @@ const CommunityWorkspace = () => {
                                     <span className="material-symbols-outlined text-[18px]">group_add</span>
                                     Requests
                                 </button>
+                            ) : (
                                 <button 
-                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'invites' ? null : 'invites')}
-                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'invites' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'recentActivity' ? null : 'recentActivity')}
+                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'recentActivity' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
                                 >
-                                    <span className="material-symbols-outlined text-[18px]">mail</span>
-                                    Invites
+                                    <span className="material-symbols-outlined text-[18px]">history</span>
+                                    Activity
                                 </button>
-                                <button 
-                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'members' ? null : 'members')}
-                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'members' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">group</span>
-                                    Members
-                                </button>
-                            </div>
+                            )}
+                            <button 
+                                onClick={() => setActiveDrawerTab(activeDrawerTab === 'invites' ? null : 'invites')}
+                                className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'invites' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                                <span className="material-symbols-outlined text-[18px]">mail</span>
+                                Invites
+                            </button>
+                            <button 
+                                onClick={() => setActiveDrawerTab(activeDrawerTab === 'members' ? null : 'members')}
+                                className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'members' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                                <span className="material-symbols-outlined text-[18px]">group</span>
+                                Members
+                            </button>
                         </div>
                     </div>
-                )}
-                
-                {/* Spacer if not admin so avatar doesn't overlap chat */}
-                {!isAdmin && <div className="mt-12"></div>}
+                </div>
 
                 {/* CHAT AREA */}
                 <div className="flex-1 min-h-0 mt-2 px-4 md:px-10 pb-6 flex flex-col overflow-hidden">

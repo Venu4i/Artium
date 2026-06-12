@@ -44,9 +44,9 @@ const AdminManagementDrawer = ({
             <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
                 <h3 className="font-headline text-[18px] text-community-on-surface flex items-center gap-2 capitalize">
                     <span className="material-symbols-outlined text-community-on-surface-variant">
-                        {activeTab === 'members' ? 'group' : activeTab === 'requests' ? 'person_add' : 'mail'}
+                        {activeTab === 'members' ? 'group' : activeTab === 'requests' ? 'person_add' : activeTab === 'recentActivity' ? 'history' : 'mail'}
                     </span>
-                    {activeTab}
+                    {activeTab === 'recentActivity' ? 'Recent Activity' : activeTab}
                 </h3>
                 <button onClick={onClose} className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-community-on-surface-variant transition-colors">
                     <span className="material-symbols-outlined text-[20px]">close</span>
@@ -55,6 +55,26 @@ const AdminManagementDrawer = ({
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 drawer-scroll">
                 
+                {/* --- RECENT ACTIVITY TAB --- */}
+                {activeTab === "recentActivity" && (
+                    <div className="flex flex-col gap-4 p-2">
+                        <div className="relative border-l dark:border-amber-50 border-black/30 ml-3 flex flex-col gap-6 mt-2">
+                            {/* Event 1 */}
+                            <div className="relative pl-6">
+                                <div className="absolute -left-[5px] top-1 w-[9px] h-[9px] rounded-full bg-pink-400 shadow-[0_0_10px_rgba(244,114,182,0.8)]"></div>
+                                <h5 className="text-community-on-surface text-[14px]">New submission in Arena</h5>
+                                <p className="text-community-on-surface-variant text-[12px] mt-1">2 mins ago</p>
+                            </div>
+                            {/* Event 2 */}
+                            <div className="relative pl-6">
+                                <div className="absolute -left-[5px] top-1 w-[9px] h-[9px] rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+                                <h5 className="text-community-on-surface text-[14px]">Server backup completed</h5>
+                                <p className="text-community-on-surface-variant text-[12px] mt-1">1 hr ago</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* --- MEMBERS TAB --- */}
                 {activeTab === "members" && (
                     <>

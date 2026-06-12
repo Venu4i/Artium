@@ -6,7 +6,8 @@ import {
     reviewSubmission,
     finalizeChallenge,
     getChallengeDetails,
-    getCommunityChallenges
+    getCommunityChallenges,
+    getUserSubmissions
 } from "../controllers/challenge.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -19,6 +20,9 @@ router.post("/:communityId", createChallenge);
 
 // Get community challenges
 router.get("/community/:communityId", getCommunityChallenges);
+
+// Get user submissions for a specific community
+router.get("/community/:communityId/user-submissions", getUserSubmissions);
 
 // Get single challenge details
 router.get("/:challengeId", getChallengeDetails);
