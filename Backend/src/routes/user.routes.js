@@ -10,6 +10,7 @@ import {
   editProfile,
   getUserProfile,
   toggleFollowUser,
+  getGlobalLeaderboard,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -25,6 +26,7 @@ router.post("/refresh", refreshAccessToken); // frontend sends refreshToken in b
 router.post("/google", googleAuth);
 
 router.get("/profile", verifyJWT, getUserProfile);
+router.get("/leaderboard", verifyJWT, getGlobalLeaderboard);
 router.post("/:userId/follow", verifyJWT, toggleFollowUser);
 router.get("/me/:id", getUser);
 router.patch("/change-password", verifyJWT, changePassword);

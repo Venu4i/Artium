@@ -397,6 +397,51 @@ const toggleFollowUser = asyncHandler(async (req, res) => {
   );
 });
 
+const getGlobalLeaderboard = asyncHandler(async (req, res) => {
+  const users = await User.find({ "points.global": { $gt: 0 } })
+    .sort({ "points.global": -1 })
+    .select("username profilePicture points.global completedChallenges points.communities createdAt")
+    .lean();
+
+  const leaderboard = users.map((user, index) => {
+    // Determine the number of communities they are active in by checking the keys in points.communities
+    const communitiesCount = user.points?.communities ? Object.keys(user.points.communities).length : 0;
+    
+    return {
+      _id: user._id,
+      rank: index + 1,
+      username: user.username,
+      avatar: user.profilePicture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
+      globalPoints: user.points?.global || 0,
+      completedChallengesCount: user.completedChallenges?.length || 0,
+      communitiesCount: communitiesCount,
+      createdAt: user.createdAt,
+      isCurrentUser: req.user && req.user._id.toString() === user._id.toString()
+    };
+  });
+
+  const hasCurrentUser = leaderboard.some(u => u.isCurrentUser);
+  if (!hasCurrentUser && req.user) {
+    const currentUser = await User.findById(req.user._id).lean();
+    if (currentUser) {
+      leaderboard.push({
+        _id: currentUser._id,
+        rank: leaderboard.length + 1,
+        username: currentUser.username,
+        avatar: currentUser.profilePicture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.username}`,
+        globalPoints: currentUser.points?.global || 0,
+        completedChallengesCount: currentUser.completedChallenges?.length || 0,
+        communitiesCount: currentUser.points?.communities ? Object.keys(currentUser.points.communities).length : 0,
+        createdAt: currentUser.createdAt,
+        isCurrentUser: true
+      });
+    }
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, leaderboard, "Global leaderboard fetched successfully")
+  );
+});
 export {
   getUserProfile,
   registerUser,
@@ -410,4 +455,5 @@ export {
   editProfile,
   searchUsers,
   toggleFollowUser,
+  getGlobalLeaderboard,
 };

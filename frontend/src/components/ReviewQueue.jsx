@@ -221,33 +221,6 @@ const ReviewQueue = ({ challenge, onBack }) => {
                     })
                 )}
             </div>
-
-            {totalCount > 0 && (
-                <div className="sticky bottom-8 z-30 mx-auto max-w-2xl mt-8">
-                    <div className="glass-card p-4 rounded-full flex items-center justify-between shadow-2xl border-community-outline/20">
-                        <div className="flex-1 pr-6">
-                            <div className="flex justify-between text-[10px] font-bold text-community-outline uppercase tracking-widest mb-2">
-                                <span>{reviewedCount} / {totalCount} reviewed</span>
-                                <span>{progressPercent}%</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-community-secondary to-pink-500 transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={handleFinalize}
-                            disabled={!canFinalize || isFinalizing}
-                            className={`px-8 py-3 rounded-full font-bold text-sm transition-all shadow-lg ${
-                                canFinalize 
-                                    ? 'bg-gradient-to-r from-community-secondary to-community-tertiary text-white shadow-community-secondary/30 active:scale-95'
-                                    : 'bg-black/20 text-white/30 border border-white/5 cursor-not-allowed'
-                            }`}
-                        >
-                            {isFinalizing ? 'Finalizing...' : 'Close Review & Finalize'}
-                        </button>
-                    </div>
-                </div>
-            )}
         </section>
     );
 };

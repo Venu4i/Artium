@@ -40,6 +40,10 @@ const CommunityLayout = () => {
         return <div className="min-h-screen bg-community-background flex items-center justify-center text-community-on-surface">Loading Community...</div>;
     }
 
+    const isAdmin = String(community.admin?._id || community.admin) === String(currentUser?._id);
+    const pointsToShow = isAdmin ? (currentUser?.points?.global || 0) : (currentUser?.points?.communities?.[id] || 0);
+    const pointsTitle = isAdmin ? "Global Points" : "Community Points";
+
     return (
         <div className={`font-body h-screen flex flex-col overflow-hidden selection:bg-[#d2bbff]/30 selection:text-[#d2bbff] transition-colors duration-500`}>
             
@@ -73,6 +77,18 @@ const CommunityLayout = () => {
                     </NavLink>
                 </div>
                 <div className="flex items-center gap-3">
+                    {/* Points Pill */}
+                    {currentUser && (
+                        <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 rounded-full px-3 py-1.5 border border-black/10 dark:border-white/10 shadow-inner mr-2" title={pointsTitle}>
+                            <div className="bg-cyan-400 text-slate-900 rounded-full p-0.5 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                            </div>
+                            <span className="text-sm font-bold text-community-on-surface font-mono tracking-wide">
+                                {pointsToShow.toLocaleString()}
+                            </span>
+                        </div>
+                    )}
+
                     <button onClick={goBack} title="Leave Community" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center">
                         <span className="material-symbols-outlined text-community-error">logout</span>
                     </button>

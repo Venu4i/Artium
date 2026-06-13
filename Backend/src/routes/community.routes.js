@@ -8,7 +8,8 @@ import {
     handleJoinRequest,
     generateInviteLink,
     acceptInviteLink,
-    getCommunity
+    getCommunity,
+    getLeaderboard
 } from "../controllers/community.controller.js"
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.post("/:communityId/request", verifyJWT, requestToJoin);
 router.post("/:communityId/handle/:userId", verifyJWT, handleJoinRequest);
 router.post("/:communityId/invite", verifyJWT, generateInviteLink);
 router.post("/invite/:token", verifyJWT, acceptInviteLink);
+router.get("/:communityId/leaderboard", verifyJWT, getLeaderboard);
 
 export default router;

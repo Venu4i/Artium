@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import challengeService from "../services/challengeService";
 import { useParams } from "react-router-dom";
 
@@ -41,12 +42,16 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <div className="bg-community-background/90 backdrop-blur-xl border border-community-outline/10 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-                <div className="p-8 space-y-6 relative">
-                    {/* Background Atmospheric Glows */}
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-community-secondary/5 blur-[80px] pointer-events-none"></div>
+    const modalContent = (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            {/* Background Atmospheric Glows */}
+            <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-community-secondary/10 blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-community-tertiary/10 blur-[120px]"></div>
+            </div>
+
+            <div className="bg-[#18181b]/90 backdrop-blur-xl border border-white/10 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[85vh] flex flex-col">
+                <div className="p-6 space-y-4 relative overflow-y-auto no-scrollbar">
                     
                     <div className="flex items-center justify-between relative z-10">
                         <h3 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -57,61 +62,69 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
                     </div>
 
                     <div className="space-y-4 relative z-10">
-                        <div className="space-y-1.5">
-                            <label className="text-[12px] font-bold text-community-outline uppercase tracking-widest">Challenge Title</label>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Challenge Title</label>
                             <input 
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full bg-black/40 border-none rounded-xl py-3 px-4 text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
+                                className="w-full bg-black/40 border-none rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
                                 placeholder="Enter a visionary name..." 
                                 type="text"
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[12px] font-bold text-community-outline uppercase tracking-widest">Description</label>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Description</label>
                             <textarea 
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full bg-black/40 border-none rounded-xl py-3 px-4 text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
+                                className="w-full bg-black/40 border-none rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
                                 placeholder="Describe the creative mission..." 
-                                rows="3"
+                                rows="2"
                             ></textarea>
                         </div>
 
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Cover Image</label>
+                            <div className="w-full border-2 border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center gap-1 hover:border-community-secondary/50 transition-colors cursor-pointer bg-black/20">
+                                <span className="material-symbols-outlined text-2xl text-community-outline">cloud_upload</span>
+                                <span className="text-xs text-community-outline">Click to upload challenge banner</span>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[12px] font-bold text-community-outline uppercase tracking-widest">Submission Deadline</label>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Submission Deadline</label>
                                 <input 
                                     value={deadline}
                                     onChange={(e) => setDeadline(e.target.value)}
-                                    className="w-full bg-black/40 border-none rounded-xl py-3 px-4 text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
+                                    className="w-full bg-black/40 border-none rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all" 
                                     type="date"
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[12px] font-bold text-community-outline uppercase tracking-widest">Max Points</label>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Max Points</label>
                                 <input 
                                     value={maxPoints}
                                     onChange={(e) => setMaxPoints(e.target.value)}
-                                    className="w-full bg-black/40 border border-transparent focus:border-community-tertiary rounded-xl py-3 px-4 text-community-on-surface focus:ring-0 transition-all" 
+                                    className="w-full bg-black/40 border border-transparent focus:border-community-tertiary rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-0 transition-all" 
                                     max="100" 
                                     type="number"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[12px] font-bold text-community-outline uppercase tracking-widest">Media Type Accepted</label>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Media Type</label>
                             <div className="flex flex-wrap gap-2">
                                 {['Image', 'Audio', 'Video', 'Text'].map(type => (
                                     <button 
                                         key={type}
                                         onClick={() => setMediaType(type)}
-                                        className={`px-4 py-2 rounded-full border text-xs font-bold transition-all ${
+                                        className={`px-4 py-1.5 rounded-full border text-xs font-bold transition-all ${
                                             mediaType === type 
-                                                ? 'bg-gradient-to-r from-community-secondary to-pink-500 text-white border-transparent' 
-                                                : 'border-community-outline/20 text-community-outline hover:border-community-outline/50'
+                                                ? 'bg-community-secondary text-white border-transparent' 
+                                                : 'border-white/10 text-community-outline hover:border-white/20'
                                         }`}
                                     >
                                         {type}
@@ -127,11 +140,11 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
                         </div>
                     )}
 
-                    <div className="pt-4 space-y-3 relative z-10">
+                    <div className="pt-2 space-y-2 relative z-10">
                         <button 
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            className="w-full py-4 rounded-full font-bold text-white bg-gradient-to-r from-community-secondary to-pink-500 shadow-[0_0_15px_rgba(255,176,205,0.3)] hover:shadow-[0_0_25px_rgba(255,176,205,0.5)] active:scale-95 transition-all disabled:opacity-50"
+                            className="w-full py-2.5 rounded-full font-bold text-white bg-community-secondary hover:bg-community-secondary/90 shadow-lg active:scale-95 transition-all disabled:opacity-50 text-sm"
                         >
                             {isSubmitting ? 'Publishing...' : 'Publish Challenge'}
                         </button>
@@ -146,6 +159,8 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
 
 export default CreateChallengeModal;

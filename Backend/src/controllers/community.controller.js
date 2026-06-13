@@ -192,3 +192,45 @@ export const getCommunity = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Get leaderboard for a community
+export const getLeaderboard = async (req, res) => {
+    try {
+        const community = await Community.findById(req.params.communityId)
+            .populate("members", "username profilePicture points completedChallenges");
+
+        if (!community) return res.status(404).json({ error: "Community not found" });
+
+        // Calculate rankings
+        let membersData = community.members
+            .filter(member => member._id.toString() !== community.admin.toString()) // Admin doesn't participate
+            .map(member => {
+                const points = member.points?.communities?.get(community._id.toString()) || 0;
+                // For simplicity, we just count their global completed challenges or filter by community if needed
+                // It's fine to just return length for MVP
+                const challengesCount = member.completedChallenges ? member.completedChallenges.length : 0;
+
+                return {
+                    id: member._id,
+                    name: member.username,
+                    avatar: member.profilePicture,
+                    points: points,
+                    challenges: challengesCount,
+                    isCurrentUser: member._id.toString() === req.user._id.toString()
+                };
+            });
+
+        // Sort by points descending
+        membersData.sort((a, b) => b.points - a.points);
+
+        // Assign ranks
+        membersData = membersData.map((member, index) => ({
+            ...member,
+            rank: index + 1
+        }));
+
+        res.status(200).json({ leaderboard: membersData });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

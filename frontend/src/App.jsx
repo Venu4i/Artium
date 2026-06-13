@@ -18,10 +18,12 @@ import UploadPage from "./pages/UploadPage";
 import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 import ExploreCommunities from "./pages/ExploreCommunities";
 import MyCommunities from "./pages/MyCommunities";
+import HallOfFame from "./pages/HallOfFame";
 import CommunityPage from "./pages/CommunityPage"; // Legacy, can remove later
 import CommunityLayout from "./layout/CommunityLayout";
 import CommunityWorkspace from "./pages/CommunityWorkspace";
 import CommunityArena from "./pages/CommunityArena";
+import CommunityPantheon from "./pages/CommunityPantheon";
 import AcceptInvite from "./pages/AcceptInvite";
 
 // Protected Route Wrapper
@@ -118,6 +120,7 @@ function App() {
           {/* --- Community System Routes (Inside MainLayout) --- */}
           <Route path="/communities" element={<ExploreCommunities />} />
           <Route path="/my-communities" element={<MyCommunities />} />
+          <Route path="/hall-of-fame" element={<HallOfFame />} />
           <Route path="/community/invite/:token" element={<AcceptInvite />} />
         </Route>
 
@@ -126,7 +129,7 @@ function App() {
           <Route index element={<Navigate to="workspace" replace />} />
           <Route path="workspace" element={<CommunityWorkspace />} />
           <Route path="arena" element={<CommunityArena />} />
-          <Route path="pantheon" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Pantheon (Pending UI)</div>} />
+          <Route path="pantheon" element={<CommunityPantheon />} />
         </Route>
 
         {/* --- 404 Catch-all --- */}

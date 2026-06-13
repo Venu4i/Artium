@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import challengeService from "../services/challengeService";
 
@@ -56,8 +57,8 @@ const SubmitWorkModal = ({ isOpen, onClose, challenge, onSuccess }) => {
 
     if (!isOpen || !challenge) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    const modalContent = (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <div className="glass-panel w-full max-w-lg rounded-2xl p-6 border border-community-outline/20 shadow-2xl relative">
                 
                 <button 
@@ -129,6 +130,8 @@ const SubmitWorkModal = ({ isOpen, onClose, challenge, onSuccess }) => {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
 
 export default SubmitWorkModal;

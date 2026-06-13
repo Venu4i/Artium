@@ -47,6 +47,11 @@ const communityService = {
         const response = await api.post(`/community/invite/${token}`);
         return response.data;
     },
+
+    async getLeaderboard(communityId) {
+        const response = await api.get(`/community/${communityId}/leaderboard`);
+        return response.data;
+    },
 };
 
 export default communityService;

@@ -109,6 +109,9 @@ export const reviewSubmission = async (req, res) => {
         throw new ApiError(403, "Unauthorized");
     }
 
+    const oldStatus = submission.status;
+    const oldPoints = submission.pointsAwarded || 0;
+
     submission.status = status;
     
     if (status === "approved") {
@@ -122,6 +125,44 @@ export const reviewSubmission = async (req, res) => {
     }
 
     await submission.save();
+
+    // Instant point adjustment
+    const diffPoints = submission.pointsAwarded - oldPoints;
+    let updateQuery = {};
+
+    if (diffPoints !== 0) {
+        updateQuery.$inc = {
+            "points.global": diffPoints,
+            [`points.communities.${submission.communityId}`]: diffPoints
+        };
+    }
+
+    if (status === "approved" && oldStatus !== "approved") {
+        updateQuery.$addToSet = { completedChallenges: submission.challengeId._id };
+    } else if (status !== "approved" && oldStatus === "approved") {
+        updateQuery.$pull = { completedChallenges: submission.challengeId._id };
+    }
+
+    if (Object.keys(updateQuery).length > 0) {
+        await User.findByIdAndUpdate(submission.submittedBy, updateQuery);
+    }
+
+    if (req.io) {
+        req.io.to(submission.submittedBy.toString()).emit("submission:reviewed", submission);
+    }
+
+    // Auto-finalize if all submissions are reviewed
+    const pendingCount = await Submission.countDocuments({ challengeId: submission.challengeId._id, status: "pending" });
+    if (pendingCount === 0) {
+        const challenge = await Challenge.findById(submission.challengeId._id);
+        if (challenge && challenge.status !== "FINALIZED") {
+            challenge.status = "FINALIZED";
+            await challenge.save();
+            if (req.io) {
+                req.io.to(community._id.toString()).emit("challenge:finalized", challenge);
+            }
+        }
+    }
 
     return res.status(200).json(new ApiResponse(200, submission, "Submission reviewed"));
 };
@@ -147,45 +188,9 @@ export const finalizeChallenge = async (req, res) => {
         throw new ApiError(400, "All submissions must be reviewed before finalizing");
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
-        const approvedSubmissions = await Submission.find({ challengeId, status: "approved" }).session(session);
-
-        for (const sub of approvedSubmissions) {
-            const points = sub.pointsAwarded;
-            const userId = sub.submittedBy;
-
-            await User.findByIdAndUpdate(
-                userId,
-                {
-                    $inc: {
-                        "points.global": points,
-                        [`points.communities.${community._id}`]: points
-                    },
-                    $addToSet: { completedChallenges: challenge._id }
-                },
-                { session }
-            );
-
-            if (req.io) {
-                req.io.to(userId.toString()).emit("submission:reviewed", sub);
-            }
-        }
-
-        const rejectedSubmissions = await Submission.find({ challengeId, status: "rejected" }).session(session);
-        for (const sub of rejectedSubmissions) {
-            if (req.io) {
-                req.io.to(sub.submittedBy.toString()).emit("submission:reviewed", sub);
-            }
-        }
-
         challenge.status = "FINALIZED";
-        await challenge.save({ session });
-
-        await session.commitTransaction();
-        session.endSession();
+        await challenge.save();
 
         if (req.io) {
             req.io.to(community._id.toString()).emit("challenge:finalized", challenge);
@@ -194,8 +199,6 @@ export const finalizeChallenge = async (req, res) => {
         return res.status(200).json(new ApiResponse(200, challenge, "Challenge finalized and points awarded"));
 
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         throw new ApiError(500, "Failed to finalize challenge: " + error.message);
     }
 };

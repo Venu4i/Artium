@@ -33,7 +33,18 @@ const TopBar = ({ user, onMenuClick }) => {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3 md:gap-6">
-                
+                {/* Points Pill */}
+                {user && (
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-zinc-800/50 rounded-full px-3 py-1.5 border border-slate-200 dark:border-slate-700/50 shadow-inner" title="Global Points">
+                        <div className="bg-cyan-400 text-slate-900 rounded-full p-0.5 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-100 font-mono tracking-wide">
+                            {(user?.points?.global || 0).toLocaleString()}
+                        </span>
+                    </div>
+                )}
+
                 {/* Theme Switcher */}
                 <button 
                     onClick={toggleTheme}

@@ -65,7 +65,7 @@ const CommunityArena = () => {
 
     return (
         <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 w-full h-full pb-20">
-            <div className="max-w-7xl mx-auto px-4 md:px-10 pt-10 space-y-10">
+            <div className="w-full px-4 md:px-10 pt-10 space-y-10">
                 
                 {/* Top Action Bar */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-community-outline/10 pb-8 mb-8">
@@ -115,6 +115,8 @@ const CommunityArena = () => {
                             {activeChallenges.map(challenge => {
                                 const submission = getSubmissionForChallenge(challenge._id);
                                 const hasSubmitted = !!submission;
+                                const isApproved = submission?.status === 'approved';
+                                const isRejected = submission?.status === 'rejected';
                                 
                                 const timeRemaining = new Date(challenge.deadline).getTime() - new Date().getTime();
                                 const daysLeft = Math.ceil(timeRemaining / (1000 * 3600 * 24));
@@ -160,10 +162,27 @@ const CommunityArena = () => {
                                                     View Submissions
                                                 </button>
                                             ) : hasSubmitted ? (
-                                                <div className="mt-auto w-full py-4 bg-community-tertiary/20 text-community-tertiary font-bold rounded-lg border border-community-tertiary/20 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(76,215,246,0.2)]">
-                                                    <span className="material-symbols-outlined text-lg">check_circle</span>
-                                                    Submitted — Pending Review
-                                                </div>
+                                                isApproved ? (
+                                                    <div className="mt-auto w-full py-4 bg-emerald-500/10 text-emerald-400 font-bold rounded-lg border border-emerald-500/20 flex flex-col items-center justify-center gap-1 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="material-symbols-outlined text-lg">workspace_premium</span>
+                                                            Approved: {submission.pointsAwarded || 0} pts
+                                                        </div>
+                                                    </div>
+                                                ) : isRejected ? (
+                                                    <div className="mt-auto w-full py-4 bg-red-500/10 text-red-400 font-bold rounded-lg border border-red-500/20 flex flex-col items-center justify-center gap-1 px-2 text-center shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="material-symbols-outlined text-lg">cancel</span>
+                                                            Not Approved
+                                                        </div>
+                                                        {submission.rejectionNote && <span className="text-[12px] opacity-80 font-normal italic">"{submission.rejectionNote}"</span>}
+                                                    </div>
+                                                ) : (
+                                                    <div className="mt-auto w-full py-4 bg-community-tertiary/20 text-community-tertiary font-bold rounded-lg border border-community-tertiary/20 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(76,215,246,0.2)]">
+                                                        <span className="material-symbols-outlined text-lg">check_circle</span>
+                                                        Pending Review
+                                                    </div>
+                                                )
                                             ) : (
                                                 <button 
                                                     onClick={() => handleOpenSubmitModal(challenge)}
