@@ -115,7 +115,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
 
   return res
@@ -156,7 +156,7 @@ const googleAuth = asyncHandler(async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
 
   const loggedInUser = await User.findById(user._id).select(
@@ -186,7 +186,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
 
   return res
@@ -225,7 +225,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
 
     return res
