@@ -49,7 +49,7 @@ export default function AiAssistantPage() {
                     feedbackMode
                 }
             );
-
+            console.log(res.data);
             setFeedback(res.data.data);
 
         } catch (err) {

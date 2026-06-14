@@ -5,7 +5,9 @@ import upload from "../middlewares/upload.js";
 import {
   getFeedback,
   generateArtChallenge,
-  generateCreativeIdeas
+  generateCreativeIdeas,
+  generateTags,
+  enhanceArtDescription,
 } from "../controllers/ai.controller.js";
 
 const router = express.Router();
@@ -15,12 +17,16 @@ router.post(
   getFeedback
 );
 
-// Image + Description → AI Analysis
-// router.post(
-//   "/analyze-artwork",
-//   upload.single("image"),
-//   analyzeArtwork
-// );
+router.post(
+  "/generate-tags",
+  generateTags
+);
+
+router.post(
+  "/enhance-description",
+  enhanceArtDescription
+);
+
 
 // Generate Challenges
 router.post(

@@ -14,7 +14,8 @@ const UploadPage = () => {
     const [description, setDescription] = useState("");
     const [tags, setTags] = useState("");
     const [loading, setLoading] = useState(false);
-    const [aiLoading, setAiLoading] = useState(false);
+    const [enhanceLoading, setEnhanceLoading] = useState(false);
+    const [tagsLoading, setTagsLoading] = useState(false);
 
     // Drag & Drop Logic
     const onDrop = (acceptedFiles) => {
@@ -45,7 +46,7 @@ const UploadPage = () => {
 
         try {
 
-            setAiLoading(true);
+            setEnhanceLoading(true);
 
             const response =
             await api.post(
@@ -54,6 +55,7 @@ const UploadPage = () => {
                     description
                 }
             );
+            console.log(response.data);
 
             setDescription(
                 response.data.enhancedDescription
@@ -65,7 +67,7 @@ const UploadPage = () => {
 
         } finally {
 
-            setAiLoading(false);
+            setEnhanceLoading(false);
         }
     };
 
@@ -99,19 +101,17 @@ const UploadPage = () => {
 
         try {
 
-            setAiLoading(true);
+            setTagsLoading(true);
 
-            const response =
-            await api.post(
-                "/ai/generate-tags",
-                {
-                    description
-                }
-            );
+            const response = await api.post( "/ai/generate-tags", { description} );
+
+            console.log("Generated Tags:", response.data.tags);
 
             setTags(
                 response.data.tags.join(", ")
             );
+
+            
 
         } catch (error) {
 
@@ -119,7 +119,7 @@ const UploadPage = () => {
 
         } finally {
 
-            setAiLoading(false);
+            setTagsLoading(false);
         }
     };
 
@@ -202,11 +202,11 @@ const UploadPage = () => {
                         <button
                             type="button"
                             onClick={handleEnhanceDescription}
-                            disabled={aiLoading}
+                            disabled={enhanceLoading}
                             className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm text-white transition"
                         >
                             {
-                                aiLoading
+                                enhanceLoading
                                     ? "Generating..."
                                     : "✨ Enhance Description"
                             }
@@ -215,11 +215,11 @@ const UploadPage = () => {
                         <button
                             type="button"
                             onClick={handleGenerateTags}
-                            disabled={aiLoading}
+                            disabled={tagsLoading}
                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-sm text-white transition"
                         >
                             {
-                                aiLoading
+                                tagsLoading
                                     ? "Generating..."
                                     : "🏷️ Generate Tags"
                             }
