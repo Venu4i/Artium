@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { chatService } from '../services/chatService';
-import ConversationSidebar from '../components/chat/ConversationSidebar';
+import ConversationSidebar from '../components/Chat/ConversationSidebar';
 import Chat from '../components/Chat/Chat.jsx';
 import { useAuth } from '../hooks/useAuth';
 import { UserPlusIcon , ChatBubbleLeftRightIcon} from '@heroicons/react/24/outline'; // v2 Icon
