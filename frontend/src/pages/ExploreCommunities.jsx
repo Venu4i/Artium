@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import communityService from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
 import { getSafeId, isSameUser } from '../utils/idHelper';
+import { useNavigate } from 'react-router-dom';
 
 const ExploreCommunities = () => {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
     const [communities, setCommunities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null); // Added UI error state
@@ -33,13 +35,30 @@ const ExploreCommunities = () => {
         fetchCommunities();
     }, []);
 
-    const handleJoin = async (communityId) => {
+    const handleJoin = async (communityId, isAlreadyRequested) => {
+        if (isAlreadyRequested) {
+            alert("Your join request is already pending!");
+            return;
+        }
         if (joining.has(communityId)) return;
         
         setJoining((prev) => new Set(prev).add(communityId));
         try {
             await communityService.requestToJoin(communityId);
-            // Optionally: alert("Request sent!");
+            alert("Join request sent successfully!");
+            
+            // Update local state to immediately show 'Pending'
+            setCommunities(prev => prev.map(c => {
+                const cId = getSafeId(c);
+                if (cId === communityId) {
+                    return {
+                        ...c,
+                        pendingRequests: [...(c.pendingRequests || []), currentUser]
+                    };
+                }
+                return c;
+            }));
+            
         } catch (err) {
             console.error('❌ Join Error:', err);
             alert(err.response?.data?.error || "Failed to send request");
@@ -93,6 +112,9 @@ const ExploreCommunities = () => {
                             const cId = getSafeId(community);
                             const isPending = joining.has(cId);
                             const alreadyRequested = community.pendingRequests?.some(r => isSameUser(r, currentUser));
+                            const isMember = community.members?.some(m => isSameUser(m, currentUser));
+                            const isAdmin = isSameUser(community.admin, currentUser);
+                            const alreadyJoined = isMember || isAdmin;
 
                             return (
                                 <motion.div
@@ -129,15 +151,25 @@ const ExploreCommunities = () => {
                                         </div>
 
                                         <button
-                                            onClick={() => handleJoin(cId)}
-                                            disabled={community.isPrivate || isPending || alreadyRequested}
+                                            onClick={() => {
+                                                if (alreadyJoined) {
+                                                    navigate(`/community/${cId}/workspace`);
+                                                } else {
+                                                    handleJoin(cId, alreadyRequested);
+                                                }
+                                            }}
+                                            disabled={community.isPrivate && !alreadyJoined}
                                             className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
-                                                community.isPrivate || isPending || alreadyRequested
+                                                (community.isPrivate && !alreadyJoined) || isPending
                                                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                                                : alreadyJoined
+                                                ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-xl shadow-cyan-500/20'
+                                                : alreadyRequested
+                                                ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
                                                 : 'bg-white text-black hover:bg-violet-500 hover:text-white shadow-xl hover:shadow-violet-500/40'
                                             }`}
                                         >
-                                            {community.isPrivate ? 'Invite Only' : isPending ? 'Sending...' : alreadyRequested ? 'Sent' : 'Join Studio'}
+                                            {alreadyJoined ? 'Enter' : community.isPrivate ? 'Invite Only' : isPending ? 'Sending...' : alreadyRequested ? 'Request Pending' : 'Join Studio'}
                                         </button>
                                     </div>
                                 </motion.div>
