@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { Outlet, NavLink, Link, useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Menu, Transition } from '@headlessui/react';
+import { UserIcon, Cog8ToothIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../hooks/useAuth';
 import { useTheme } from "../context/ThemeContext";
 import communityService from "../services/communityService";
 import PremiumBackground from "../components/PremiumBackground";
@@ -9,6 +12,7 @@ const CommunityLayout = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
+    const { logout } = useAuth();
     const currentUser = useSelector((state) => state.auth.user);
     const [community, setCommunity] = useState(null);
 
@@ -100,13 +104,69 @@ const CommunityLayout = () => {
                     <Link to="/notifications" aria-label="Notifications" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center">
                         <span className="material-symbols-outlined text-community-on-surface">notifications</span>
                     </Link>
-                    <div onClick={() => navigate('/profile')} className="ml-1 w-10 h-10 rounded-full overflow-hidden border border-black/10 dark:border-white/10 cursor-pointer">
-                        <img 
-                            alt="Profile Avatar" 
-                            className="w-full h-full object-cover" 
-                            src={currentUser?.profilePicture || "https://res.cloudinary.com/demo/image/upload/v1633535288/sample.jpg"}
-                        />
-                    </div>
+                    <Menu as="div" className="relative ml-1 z-50">
+                        <Menu.Button className="flex items-center focus:outline-none w-10 h-10 rounded-full overflow-hidden border border-black/10 dark:border-white/10 cursor-pointer">
+                            <img 
+                                alt="Profile Avatar" 
+                                className="w-full h-full object-cover" 
+                                src={currentUser?.profilePicture || `https://ui-avatars.com/api/?name=${currentUser?.username || 'User'}`}
+                            />
+                        </Menu.Button>
+                        <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-200"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                        >
+                            <Menu.Items className="absolute right-0 mt-3 w-48 origin-top-right rounded-2xl bg-white dark:bg-zinc-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl focus:outline-none overflow-hidden">
+                                <div className="p-1">
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                onClick={() => navigate('/profile')}
+                                                className={`${
+                                                    active ? 'bg-slate-100 text-slate-900 dark:bg-white/10 dark:text-white' : 'text-slate-700 dark:text-slate-300'
+                                                } group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-colors`}
+                                            >
+                                                <UserIcon className="mr-3 h-5 w-5 text-slate-400 group-hover:text-violet-500 dark:group-hover:text-violet-400" aria-hidden="true" />
+                                                Profile
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                onClick={() => navigate('/settings')}
+                                                className={`${
+                                                    active ? 'bg-slate-100 text-slate-900 dark:bg-white/10 dark:text-white' : 'text-slate-700 dark:text-slate-300'
+                                                } group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-colors`}
+                                            >
+                                                <Cog8ToothIcon className="mr-3 h-5 w-5 text-slate-400 group-hover:text-emerald-500 dark:group-hover:text-emerald-400" aria-hidden="true" />
+                                                Settings
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                    <div className="my-1 border-t border-slate-100 dark:border-white/5"></div>
+                                    <Menu.Item>
+                                        {({ active }) => (
+                                            <button
+                                                onClick={logout}
+                                                className={`${
+                                                    active ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'
+                                                } group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-colors`}
+                                            >
+                                                <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5 text-slate-400 group-hover:text-rose-500 dark:group-hover:text-rose-400" aria-hidden="true" />
+                                                Logout
+                                            </button>
+                                        )}
+                                    </Menu.Item>
+                                </div>
+                            </Menu.Items>
+                        </Transition>
+                    </Menu>
                 </div>
             </nav>
 

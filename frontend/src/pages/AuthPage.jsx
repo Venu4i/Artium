@@ -93,6 +93,24 @@ export default function AuthPage() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    const demoEmail = "alex@example.com";
+    const demoPassword = "password123";
+    
+    setFormData({ username: "", email: demoEmail, password: demoPassword });
+    setLoading(true);
+    
+    try {
+      const response = await api.post("/user/login", { identifier: demoEmail, password: demoPassword });
+      const { user } = response.data.data;
+      dispatch(setCredentials({ user }));
+    } catch (error) {
+      alert(error.response?.data?.message || "Demo login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full relative bg-[#09090b] text-[#e8dfee] font-sans antialiased overflow-x-hidden selection:bg-[#d2bbff]/30 selection:text-[#d2bbff]">
       <PremiumBackground />
@@ -292,7 +310,7 @@ export default function AuthPage() {
                 </div>
 
                 {/* Submit Action */}
-                <div className="mt-6 pt-2">
+                <div className="mt-6 pt-2 space-y-4">
                   <button
                     type="submit"
                     disabled={loading}
@@ -300,6 +318,18 @@ export default function AuthPage() {
                   >
                     {loading ? "Processing..." : isLogin ? "Sign In" : "Initialize Account"}
                   </button>
+
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={handleDemoLogin}
+                      disabled={loading}
+                      className="w-full py-3 bg-transparent border border-[#4cd7f6]/50 text-[#4cd7f6] rounded-lg text-lg font-medium hover:bg-[#4cd7f6]/10 hover:border-[#4cd7f6] transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+                    >
+                      Try Demo Account
+                    </button>
+                  )}
+
                   <p className="mt-6 text-center text-xs text-[#ccc3d8] opacity-60">
                     By proceeding, you agree to Artium's <a className="text-[#4cd7f6] hover:underline underline-offset-2" href="#">Terms of Service</a> & <a className="text-[#4cd7f6] hover:underline underline-offset-2" href="#">Privacy Policy</a>.
                   </p>
