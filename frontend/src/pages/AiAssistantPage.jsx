@@ -41,8 +41,8 @@ export default function AiAssistantPage() {
 
             setLoading(true);
 
-            const res = await axios.post(
-                "http://localhost:5000/api/v1/ai/art-feedback",
+            const res = await api.post(
+                "/ai/art-feedback",
                 {
                     description,
                     artType,
@@ -68,8 +68,8 @@ export default function AiAssistantPage() {
 
             setLoading(true);
 
-            const res = await axios.post(
-                "http://localhost:5000/api/v1/ai/creative-ideas",
+            const res = await api.post(
+                "/ai/creative-ideas",
                 {
                     topic,
                     artType: ideaArtType
