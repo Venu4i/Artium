@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import {
     HomeIcon, CloudArrowUpIcon, UserGroupIcon,
     XMarkIcon,
-    ChatBubbleLeftRightIcon, ArrowRightOnRectangleIcon, SparklesIcon
+    ChatBubbleLeftRightIcon, ArrowRightOnRectangleIcon, TrophyIcon,SparklesIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -94,28 +94,15 @@ const NavContent = ({ user, closeMobileMenu }) => {
                         Communities
                     </p>
                 </div>
-
-                <NavItem
-                    to="/communities"
-                    icon={UserGroupIcon}
-                    label="Hubs"
-                    onClick={closeMobileMenu}
-                />
-
-                <NavItem
-                    to="/my-communities"
-                    icon={UserGroupIcon}
-                    label="Guilds"
-                    onClick={closeMobileMenu}
-                />
-
+                <NavItem to="/communities" icon={UserGroupIcon} label="Hubs" onClick={closeMobileMenu} />
+                <NavItem to="/my-communities" icon={UserGroupIcon} label="Guilds" onClick={closeMobileMenu} />
+                <NavItem to="/hall-of-fame" icon={TrophyIcon} label="Hall of Fame" onClick={closeMobileMenu} />
                 <NavItem
                     to="/ai-assistant"
                     icon={SparklesIcon}
                     label="Art Mentor"
                     onClick={closeMobileMenu}
                 />
-
             </nav>
 
             {/* Upload Button at Bottom */}

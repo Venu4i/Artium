@@ -15,7 +15,7 @@ const MainLayout = () => {
     const location = useLocation();
 
     // Pages without navigation
-    const hideNavigation = location.pathname.startsWith('/profile') || location.pathname.startsWith('/settings');
+    const hideNavigation = location.pathname.startsWith('/profile') || location.pathname.startsWith('/settings') || location.pathname.startsWith('/notifications');
 
     const fetchUser = React.useCallback(async () => {
         try {

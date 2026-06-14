@@ -7,11 +7,47 @@ import {
 } from '@heroicons/react/24/outline';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { useSocket } from '../../context/SocketContext';
+import { notificationService } from '../../services/notificationService';
+import { useState, useEffect } from 'react';
 
 const TopBar = ({ user, onMenuClick }) => {
     const { theme, toggleTheme } = useTheme();
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const socket = useSocket();
+    
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!user) return;
+        
+        // Fetch initial unread count
+        const fetchUnread = async () => {
+            try {
+                const res = await notificationService.getNotifications();
+                const unread = res.data.filter(n => !n.read).length;
+                setUnreadCount(unread);
+            } catch (error) {
+                console.error("Failed to fetch notifications", error);
+            }
+        };
+        fetchUnread();
+    }, [user]);
+
+    useEffect(() => {
+        if (!socket || !user) return;
+
+        const handleNewNotification = (notif) => {
+            setUnreadCount(prev => prev + 1);
+        };
+
+        socket.on("new-notification", handleNewNotification);
+
+        return () => {
+            socket.off("new-notification", handleNewNotification);
+        };
+    }, [socket, user]);
 
     return (
         <header className="fixed top-0 left-0 w-full z-50 px-4 md:px-8 py-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 shadow-sm flex justify-between items-center h-20 transition-colors duration-300">
@@ -33,7 +69,18 @@ const TopBar = ({ user, onMenuClick }) => {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3 md:gap-6">
-                
+                {/* Points Pill */}
+                {user && (
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-zinc-800/50 rounded-full px-3 py-1.5 border border-slate-200 dark:border-slate-700/50 shadow-inner" title="Global Points">
+                        <div className="bg-cyan-400 text-slate-900 rounded-full p-0.5 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        </div>
+                        <span className="text-sm font-bold text-cyan-400 font-mono tracking-wide">
+                            {(user?.points?.global || 0).toLocaleString()}
+                        </span>
+                    </div>
+                )}
+
                 {/* Theme Switcher */}
                 <button 
                     onClick={toggleTheme}
@@ -47,9 +94,12 @@ const TopBar = ({ user, onMenuClick }) => {
                 </button>
 
                 {/* Notifications */}
-                <button className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors text-slate-900 dark:text-white">
+                <Link to="/notifications" className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors text-slate-900 dark:text-white">
                     <BellIcon className="w-5 h-5" />
-                </button>
+                    {unreadCount > 0 && (
+                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full shadow-sm ring-2 ring-white dark:ring-zinc-900"></span>
+                    )}
+                </Link>
 
                 {/* Connected Profile Section Dropdown */}
                 <Menu as="div" className="relative ml-2">

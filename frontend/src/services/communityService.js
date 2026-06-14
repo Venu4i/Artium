@@ -47,6 +47,25 @@ const communityService = {
         const response = await api.post(`/community/invite/${token}`);
         return response.data;
     },
+
+    async getLeaderboard(communityId) {
+        const response = await api.get(`/community/${communityId}/leaderboard`);
+        return response.data;
+    },
+
+    async getCommunityActivity(communityId) {
+        const response = await api.get(`/community/${communityId}/activity`);
+        return response.data;
+    },
+
+    // Update community
+    async updateCommunity(communityId, formData) {
+        // FormData is used for file uploads
+        const response = await api.put(`/community/${communityId}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return response.data;
+    }
 };
 
 export default communityService;

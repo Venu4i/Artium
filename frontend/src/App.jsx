@@ -15,12 +15,16 @@ import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import UploadPage from "./pages/UploadPage";
-import ChatPage from "./pages/ChatPage"; // 
+import NotificationsPage from "./pages/Notifications";
+import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 import ExploreCommunities from "./pages/ExploreCommunities";
 import MyCommunities from "./pages/MyCommunities";
-import CommunityPage from "./pages/CommunityPage"; 
+import HallOfFame from "./pages/HallOfFame";
+import CommunityPage from "./pages/CommunityPage"; // Legacy, can remove later
 import CommunityLayout from "./layout/CommunityLayout";
 import CommunityWorkspace from "./pages/CommunityWorkspace";
+import CommunityArena from "./pages/CommunityArena";
+import CommunityPantheon from "./pages/CommunityPantheon";
 import AcceptInvite from "./pages/AcceptInvite";
 import AiAssistantPage from "./pages/AiAssistantPage";
 
@@ -109,6 +113,7 @@ function App() {
           
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/ai-assistant" element={<AiAssistantPage />} />
           
           <Route path="/upload" element={<UploadPage />} />
@@ -119,6 +124,7 @@ function App() {
           {/* --- Community System Routes (Inside MainLayout) --- */}
           <Route path="/communities" element={<ExploreCommunities />} />
           <Route path="/my-communities" element={<MyCommunities />} />
+          <Route path="/hall-of-fame" element={<HallOfFame />} />
           <Route path="/community/invite/:token" element={<AcceptInvite />} />
         </Route>
 
@@ -126,8 +132,8 @@ function App() {
         <Route path="/community/:id" element={<CommunityRouteWrapper />}>
           <Route index element={<Navigate to="workspace" replace />} />
           <Route path="workspace" element={<CommunityWorkspace />} />
-          <Route path="arena" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Arena (Pending UI)</div>} />
-          <Route path="pantheon" element={<div className="flex-1 flex items-center justify-center text-community-on-surface text-xl">Pantheon (Pending UI)</div>} />
+          <Route path="arena" element={<CommunityArena />} />
+          <Route path="pantheon" element={<CommunityPantheon />} />
         </Route>
 
         {/* --- 404 Catch-all --- */}

@@ -5,6 +5,7 @@ import { chatService } from "../services/chatService";
 import communityService from "../services/communityService";
 import { useSocket } from "../context/SocketContext";
 import AdminManagementDrawer from "../components/AdminManagementDrawer";
+import EditCommunityModal from "../components/EditCommunityModal";
 
 const CommunityWorkspace = () => {
     const { id } = useParams();
@@ -17,6 +18,7 @@ const CommunityWorkspace = () => {
     
     // Create a local state clone of community to handle optimistic updates for requests
     const [localCommunity, setLocalCommunity] = useState(community);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     
     const messagesEndRef = useRef(null);
 
@@ -104,12 +106,12 @@ const CommunityWorkspace = () => {
                         <img 
                             alt="Community Cover" 
                             className="w-full h-full object-cover opacity-60" 
-                            src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+                            src={localCommunity?.coverImage || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-community-background via-transparent to-transparent"></div>
                     </div>
                     {isAdmin && (
-                        <button className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/10 text-white px-4 py-2 rounded-full text-body-sm font-data-mono flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10 active:scale-95">
+                        <button onClick={() => setIsEditModalOpen(true)} className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/10 text-white px-4 py-2 rounded-full text-body-sm font-data-mono flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10 active:scale-95">
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                             Edit Cover
                         </button>
@@ -121,22 +123,22 @@ const CommunityWorkspace = () => {
                             <img 
                                 alt="Community Avatar" 
                                 className="w-full h-full object-cover" 
-                                src="https://res.cloudinary.com/demo/image/upload/v1633535288/sample.jpg"
+                                src={localCommunity?.avatar || "https://res.cloudinary.com/demo/image/upload/v1633535288/sample.jpg"}
                             />
                             {isAdmin && (
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+                                <div onClick={() => setIsEditModalOpen(true)} className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
                                     <span className="material-symbols-outlined text-community-secondary">edit</span>
                                 </div>
                             )}
                         </div>
                         <div className="flex-1 pb-1">
-                            <div className={`flex items-center gap-2 group/title w-max ${isAdmin ? 'cursor-text border-b border-transparent hover:border-black/20 dark:hover:border-white/20' : ''} pb-1 transition-colors`}>
+                            <div onClick={() => isAdmin && setIsEditModalOpen(true)} className={`flex items-center gap-2 group/title w-max ${isAdmin ? 'cursor-text border-b border-transparent hover:border-black/20 dark:hover:border-white/20' : ''} pb-1 transition-colors`}>
                                 <h1 className="font-headline text-[32px] text-community-on-surface leading-none">
                                     {localCommunity?.name || "Community"}
                                 </h1>
                                 {isAdmin && <span className="material-symbols-outlined text-community-on-surface-variant text-[18px] opacity-0 group-hover/title:opacity-100 transition-opacity">edit</span>}
                             </div>
-                            <div className={`flex items-center gap-2 group/desc w-max ${isAdmin ? 'cursor-text border-b border-transparent hover:border-black/20 dark:hover:border-white/20' : ''} pb-0.5 transition-colors mt-1`}>
+                            <div onClick={() => isAdmin && setIsEditModalOpen(true)} className={`flex items-center gap-2 group/desc w-max ${isAdmin ? 'cursor-text border-b border-transparent hover:border-black/20 dark:hover:border-white/20' : ''} pb-0.5 transition-colors mt-1`}>
                                 <p className="font-body text-community-on-surface-variant">{localCommunity?.description || "Unleash your imagination."}</p>
                                 {isAdmin && <span className="material-symbols-outlined text-community-on-surface-variant text-[14px] opacity-0 group-hover/desc:opacity-100 transition-opacity">edit</span>}
                             </div>
@@ -144,11 +146,11 @@ const CommunityWorkspace = () => {
                     </div>
                 </div>
 
-                {/* ADMIN CONTROL BAR */}
-                {isAdmin && (
-                    <div className="mt-12 px-4 md:px-10 shrink-0 flex justify-center">
-                        <div className="glass-panel rounded-full px-2 py-2 inline-flex items-center shadow-lg">
-                            <div className="flex items-center justify-center gap-4">
+                {/* CONTROL BAR */}
+                <div className="mt-12 px-4 md:px-10 shrink-0 flex justify-center">
+                    <div className="glass-panel rounded-full px-2 py-2 inline-flex items-center shadow-lg">
+                        <div className="flex items-center justify-center gap-4">
+                            {isAdmin ? (
                                 <button 
                                     onClick={() => setActiveDrawerTab(activeDrawerTab === 'requests' ? null : 'requests')}
                                     className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'requests' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
@@ -156,27 +158,32 @@ const CommunityWorkspace = () => {
                                     <span className="material-symbols-outlined text-[18px]">group_add</span>
                                     Requests
                                 </button>
+                            ) : (
                                 <button 
-                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'invites' ? null : 'invites')}
-                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'invites' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'recentActivity' ? null : 'recentActivity')}
+                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'recentActivity' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
                                 >
-                                    <span className="material-symbols-outlined text-[18px]">mail</span>
-                                    Invites
+                                    <span className="material-symbols-outlined text-[18px]">history</span>
+                                    Activity
                                 </button>
-                                <button 
-                                    onClick={() => setActiveDrawerTab(activeDrawerTab === 'members' ? null : 'members')}
-                                    className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'members' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">group</span>
-                                    Members
-                                </button>
-                            </div>
+                            )}
+                            <button 
+                                onClick={() => setActiveDrawerTab(activeDrawerTab === 'invites' ? null : 'invites')}
+                                className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'invites' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                                <span className="material-symbols-outlined text-[18px]">mail</span>
+                                Invites
+                            </button>
+                            <button 
+                                onClick={() => setActiveDrawerTab(activeDrawerTab === 'members' ? null : 'members')}
+                                className={`px-4 py-1.5 rounded-full text-body-sm font-data-mono transition-colors flex items-center gap-2 ${activeDrawerTab === 'members' ? 'bg-black/10 dark:bg-white/10 text-community-on-surface' : 'text-community-on-surface hover:bg-black/5 dark:hover:bg-white/5'}`}
+                            >
+                                <span className="material-symbols-outlined text-[18px]">group</span>
+                                Members
+                            </button>
                         </div>
                     </div>
-                )}
-                
-                {/* Spacer if not admin so avatar doesn't overlap chat */}
-                {!isAdmin && <div className="mt-12"></div>}
+                </div>
 
                 {/* CHAT AREA */}
                 <div className="flex-1 min-h-0 mt-2 px-4 md:px-10 pb-6 flex flex-col overflow-hidden">
@@ -259,6 +266,12 @@ const CommunityWorkspace = () => {
                 onRejectRequest={handleRejectRequest}
             />
 
+            <EditCommunityModal
+                isOpen={isEditModalOpen}
+                closeModal={() => setIsEditModalOpen(false)}
+                community={localCommunity}
+                setCommunity={setLocalCommunity}
+            />
         </div>
     );
 };

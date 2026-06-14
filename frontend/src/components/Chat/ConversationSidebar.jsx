@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 const ConversationSidebar = ({ conversations, activeId, onSelect }) => {
+  const { user: currentUser } = useAuth();
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar">
       {conversations.length === 0 ? (
@@ -11,7 +13,7 @@ const ConversationSidebar = ({ conversations, activeId, onSelect }) => {
       ) : (
         conversations.map((conv) => {
           // Find the other participant (not the current user)
-          const artist = conv.participants[0]; // Logic depends on your backend populate
+          const artist = conv.participants.find(p => p._id?.toString() !== currentUser?._id?.toString()) || conv.participants[0];
           const isActive = activeId === conv._id;
 
           return (
@@ -25,7 +27,7 @@ const ConversationSidebar = ({ conversations, activeId, onSelect }) => {
             >
               <div className="relative">
                 <img 
-                  src={artist?.avatar || "/default-avatar.png"} 
+                  src={artist?.profilePicture || artist?.avatar || "https://ui-avatars.com/api/?name=" + (artist?.username || "A")} 
                   className="w-12 h-12 rounded-full object-cover border border-white/10"
                   alt="avatar"
                 />

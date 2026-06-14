@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.16",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "framer-motion": "^12.26.2",
     "heroicons": "^2.2.0",
     "jwt-decode": "^4.0.0",
