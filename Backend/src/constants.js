@@ -1,1 +1,1 @@
-export const DB_name = "Blaze";
+export const DB_name ="Blaze";

@@ -26,6 +26,7 @@ import CommunityWorkspace from "./pages/CommunityWorkspace";
 import CommunityArena from "./pages/CommunityArena";
 import CommunityPantheon from "./pages/CommunityPantheon";
 import AcceptInvite from "./pages/AcceptInvite";
+import AiAssistantPage from "./pages/AiAssistantPage";
 
 // Protected Route Wrapper
 const ProtectedLayout = () => {
@@ -113,6 +114,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/ai-assistant" element={<AiAssistantPage />} />
           
           <Route path="/upload" element={<UploadPage />} />
 
