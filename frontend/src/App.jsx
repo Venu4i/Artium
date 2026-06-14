@@ -15,13 +15,14 @@ import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import UploadPage from "./pages/UploadPage";
-import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
+import ChatPage from "./pages/ChatPage"; // 
 import ExploreCommunities from "./pages/ExploreCommunities";
 import MyCommunities from "./pages/MyCommunities";
-import CommunityPage from "./pages/CommunityPage"; // Legacy, can remove later
+import CommunityPage from "./pages/CommunityPage"; 
 import CommunityLayout from "./layout/CommunityLayout";
 import CommunityWorkspace from "./pages/CommunityWorkspace";
 import AcceptInvite from "./pages/AcceptInvite";
+import AiAssistantPage from "./pages/AiAssistantPage";
 
 // Protected Route Wrapper
 const ProtectedLayout = () => {

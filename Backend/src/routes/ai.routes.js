@@ -3,36 +3,35 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/upload.js";
 
 import {
-  speechToText,
-  getArtFeedback,
-  enhanceDescription,
-  generateTags,
+  getFeedback,
+  generateArtChallenge,
+  generateCreativeIdeas
 } from "../controllers/ai.controller.js";
 
 const router = express.Router();
 
-// Voice → Text
 router.post(
-  "/speech-to-text", verifyJWT, upload.single("audio"),
-  speechToText
+  "/art-feedback",
+  getFeedback
 );
 
-// AI Art Mentor
-router.post( 
-"/art-feedback", verifyJWT,
-  getArtFeedback
+// Image + Description → AI Analysis
+// router.post(
+//   "/analyze-artwork",
+//   upload.single("image"),
+//   analyzeArtwork
+// );
+
+// Generate Challenges
+router.post(
+  "/art-challenge",
+  generateArtChallenge
 );
 
-// AI Description Enhancer
+// Generate Creative Ideas
 router.post(
- "/enhance-description", verifyJWT,
-  enhanceDescription
-);
-
-// AI Auto Tag Generator
-router.post(
-  "/generate-tags",verifyJWT,
-   generateTags
+  "/creative-ideas",
+  generateCreativeIdeas
 );
 
 export default router;

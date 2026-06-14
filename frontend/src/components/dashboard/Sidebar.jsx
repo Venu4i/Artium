@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import {
     HomeIcon, CloudArrowUpIcon, UserGroupIcon,
     XMarkIcon,
-    ChatBubbleLeftRightIcon, ArrowRightOnRectangleIcon
+    ChatBubbleLeftRightIcon, ArrowRightOnRectangleIcon, SparklesIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -109,17 +109,9 @@ const NavContent = ({ user, closeMobileMenu }) => {
                     onClick={closeMobileMenu}
                 />
 
-                {/* AI Studio */}
-
-                <div className="pt-4 pb-1">
-                    <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                        AI Studio
-                    </p>
-                </div>
-
                 <NavItem
                     to="/ai-assistant"
-                    icon={PhotoIcon}
+                    icon={SparklesIcon}
                     label="Art Mentor"
                     onClick={closeMobileMenu}
                 />
