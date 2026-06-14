@@ -342,9 +342,16 @@ const searchUsers = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (!user) throw new ApiError(404, "User not found");
+
+  // Compute global rank
+  const userPoints = user.points?.global || 0;
+  // Count how many users have more points than this user
+  const higherRankedCount = await User.countDocuments({ "points.global": { $gt: userPoints } });
+  const rank = higherRankedCount + 1;
+
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "User profile fetched successfully"));
+    .json(new ApiResponse(200, { ...user.toObject(), rank }, "User profile fetched successfully"));
 });
 
 // Toggle follow / unfollow another user

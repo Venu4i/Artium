@@ -7,8 +7,10 @@ export const injectStore = (_store) => {
   store = _store;
 };
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: `${BACKEND_URL}/api/v1`,
   withCredentials: true, // Ensure cookies are sent with every request
 });
 
@@ -35,7 +37,7 @@ api.interceptors.response.use(
       try {
         // Correctly send the refresh token using cookies
         const response = await axios.post(
-          "http://localhost:5000/api/v1/user/refresh",
+          `${BACKEND_URL}/api/v1/user/refresh`,
           {}, // No body needed
           { withCredentials: true } // Ensure cookies are sent
         );

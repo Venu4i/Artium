@@ -10,6 +10,7 @@ import {
     getUserSubmissions
 } from "../controllers/challenge.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import upload from "../middlewares/upload.js";
 
 const router = Router();
 
@@ -28,7 +29,7 @@ router.get("/community/:communityId/user-submissions", getUserSubmissions);
 router.get("/:challengeId", getChallengeDetails);
 
 // Submit to challenge
-router.post("/:challengeId/submit", submitToChallenge);
+router.post("/:challengeId/submit", upload.single("file"), submitToChallenge);
 
 // Close submissions (Admin)
 router.put("/:challengeId/close-submissions", closeSubmissions);

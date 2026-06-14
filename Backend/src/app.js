@@ -47,6 +47,7 @@ import artworkRouter from "./routes/artwork.routes.js";
 import communityRouter from "./routes/community.routes.js";
 import challengeRouter from "./routes/challenge.routes.js";
 import leaderboardRouter from "./routes/leaderboard.routes.js";
+import notificationRouter from "./routes/notification.routes.js";
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/messages", messageRouter);
@@ -55,6 +56,7 @@ app.use("/api/v1/artworks", artworkRouter);
 app.use("/api/v1/community", communityRouter);
 app.use("/api/v1/challenges", challengeRouter);
 app.use("/api/v1/leaderboards", leaderboardRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 // ✅ Health check (VERY useful)
 app.get("/health", (_, res) => {

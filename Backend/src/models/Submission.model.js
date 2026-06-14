@@ -24,6 +24,13 @@ const submissionSchema = new mongoose.Schema(
         mediaUrl: {
             type: String // Direct link to media
         },
+        description: {
+            type: String // Description of the submission
+        },
+        earlyBonus: {
+            type: Boolean,
+            default: false
+        },
         status: {
             type: String,
             enum: ["pending", "approved", "rejected"],

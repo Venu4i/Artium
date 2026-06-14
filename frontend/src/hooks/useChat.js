@@ -20,8 +20,8 @@ export const useChat = (conversationId, receiverId) => {
       if (!conversationId) return;
       try {
         console.log(`📂 Loading history for canvas: ${conversationId}`);
-        const history = await chatService.getMessages(conversationId);
-        setMessages(history);
+        const historyResponse = await chatService.getMessages(conversationId);
+        setMessages(historyResponse.data || []);
       } catch (err) {
         console.error("❌ Failed to load Chroma history:", err.message);
       }

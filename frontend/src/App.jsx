@@ -15,6 +15,7 @@ import FeedPage from "./pages/FeedPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import UploadPage from "./pages/UploadPage";
+import NotificationsPage from "./pages/Notifications";
 import ChatPage from "./pages/ChatPage"; // 👈 Added ChatPage
 import ExploreCommunities from "./pages/ExploreCommunities";
 import MyCommunities from "./pages/MyCommunities";
@@ -111,6 +112,7 @@ function App() {
           
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           
           <Route path="/upload" element={<UploadPage />} />
 

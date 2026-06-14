@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 const notificationSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // recipient
-  type: { type: String, enum: ["comment", "like", "follow", "invite", "mention", "challenge"], required: true },
+  type: { type: String, enum: ["comment", "like", "follow", "invite", "mention", "challenge", "request_accepted", "submission_accepted", "join_request"], required: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // who caused it
   post: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
   community: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },

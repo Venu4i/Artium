@@ -1,5 +1,6 @@
 import { Artwork } from "../models/Artwork.model.js";
 import User from "../models/User.model.js";
+import Notification from "../models/Notification.model.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -89,6 +90,21 @@ const toggleLikeArtwork = asyncHandler(async (req, res) => {
     } else {
         await Artwork.findByIdAndUpdate(artworkId, { $push: { likes: userId } });
         await User.findByIdAndUpdate(userId, { $push: { likedPosts: artworkId } });
+
+        // Add Notification
+        if (artwork.owner.toString() !== userId.toString()) {
+            const notif = await Notification.create({
+                user: artwork.owner,
+                type: "like",
+                owner: userId,
+                post: artworkId,
+                message: "liked your artwork."
+            });
+            const populatedNotif = await Notification.findById(notif._id).populate("owner", "username profilePicture");
+            if (req.io) {
+                req.io.to(artwork.owner.toString()).emit("new-notification", populatedNotif);
+            }
+        }
     }
 
     const updated = await Artwork.findById(artworkId)
@@ -114,6 +130,21 @@ const addComment = asyncHandler(async (req, res) => {
 
     artwork.comments.push({ user: userId, text: text.trim() });
     await artwork.save();
+
+    // Add Notification
+    if (artwork.owner.toString() !== userId.toString()) {
+        const notif = await Notification.create({
+            user: artwork.owner,
+            type: "comment",
+            owner: userId,
+            post: artworkId,
+            message: "commented on your artwork: " + text.trim().substring(0, 30) + (text.trim().length > 30 ? "..." : "")
+        });
+        const populatedNotif = await Notification.findById(notif._id).populate("owner", "username profilePicture");
+        if (req.io) {
+            req.io.to(artwork.owner.toString()).emit("new-notification", populatedNotif);
+        }
+    }
 
     const populated = await Artwork.findById(artworkId)
         .populate("owner", "username profilePicture")

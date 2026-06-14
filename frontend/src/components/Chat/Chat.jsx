@@ -8,7 +8,7 @@ const Chat = ({ activeConversation, currentUser }) => {
   const scrollRef = useRef();
   
   // Find the artist we are talking to
-  const targetArtist = activeConversation?.participants.find(p => p._id !== currentUser._id);
+  const targetArtist = activeConversation?.participants.find(p => p._id?.toString() !== currentUser._id?.toString());
   
   const { messages, sendMessage } = useChat(
     activeConversation?._id, 
@@ -31,7 +31,7 @@ const Chat = ({ activeConversation, currentUser }) => {
       <header className="p-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-400 p-[1.5px]">
-             <img src={targetArtist?.avatar} className="w-full h-full rounded-full bg-zinc-900 object-cover" alt="artist" />
+             <img src={targetArtist?.profilePicture || targetArtist?.avatar} className="w-full h-full rounded-full bg-zinc-900 object-cover" alt="artist" />
           </div>
           <div>
             <h3 className="text-slate-100 font-semibold">{targetArtist?.username}</h3>

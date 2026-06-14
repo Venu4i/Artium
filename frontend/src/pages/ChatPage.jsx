@@ -77,7 +77,7 @@ const ChatPage = () => {
                     className="flex-shrink-0 flex flex-col items-center group"
                   >
                     <div className="w-12 h-12 rounded-full border-2 border-violet-500/30 p-0.5 group-hover:border-violet-400 transition-all">
-                      <img src={u.avatar} alt={u.username} className="w-full h-full rounded-full object-cover" />
+                      <img src={u.profilePicture || u.avatar} alt={u.username} className="w-full h-full rounded-full object-cover" />
                     </div>
                     <span className="text-[10px] text-slate-400 mt-1 group-hover:text-white truncate w-12 text-center">
                         {u.username.split(' ')[0]}

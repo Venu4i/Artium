@@ -127,14 +127,14 @@ const ExploreCommunities = () => {
 
                                         <button
                                             onClick={() => handleJoin(cId)}
-                                            disabled={isPending || alreadyRequested}
+                                            disabled={community.isPrivate || isPending || alreadyRequested}
                                             className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
-                                                isPending || alreadyRequested
+                                                community.isPrivate || isPending || alreadyRequested
                                                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
                                                 : 'bg-white text-black hover:bg-violet-500 hover:text-white shadow-xl hover:shadow-violet-500/40'
                                             }`}
                                         >
-                                            {isPending ? 'Sending...' : alreadyRequested ? 'Requested' : 'Join Studio'}
+                                            {community.isPrivate ? 'Invite Only' : isPending ? 'Sending...' : alreadyRequested ? 'Requested' : 'Join Studio'}
                                         </button>
                                     </div>
                                 </motion.div>

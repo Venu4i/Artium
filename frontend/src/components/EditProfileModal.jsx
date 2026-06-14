@@ -1,12 +1,10 @@
 import React, { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { CameraIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
 import api from '../api/axios';
 
-const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
+const EditProfileModal = ({ isOpen, closeModal, user, refreshUser, onUpdateSuccess }) => {
     const [formData, setFormData] = useState({
-        bio: '', instagram: '', twitter: '', portfolioLink: '', skills: ''
+        username: '', bio: '', instagram: '', twitter: '', portfolioLink: '', skills: ''
     });
 
     const [avatarPreview, setAvatarPreview] = useState(null);
@@ -14,16 +12,19 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
     const [coverPreview, setCoverPreview] = useState(null);
     const [coverFile, setCoverFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [skillInput, setSkillInput] = useState('');
+    const [skillsList, setSkillsList] = useState([]);
 
     useEffect(() => {
         if (user) {
             setFormData({
+                username: user.username || '',
                 bio: user.bio || '',
                 instagram: user.socialLinks?.instagram || '',
                 twitter: user.socialLinks?.twitter || '',
-                portfolioLink: user.socialLinks?.portfolio || '',
-                skills: user.skills ? user.skills.join(', ') : ''
+                portfolioLink: user.socialLinks?.portfolio || ''
             });
+            setSkillsList(user.skills || []);
             setAvatarPreview(user.profilePicture);
             setCoverPreview(user.coverImage);
         }
@@ -45,16 +46,31 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
         }
     };
 
+    const handleAddSkill = (e) => {
+        if (e.key === 'Enter' && skillInput.trim()) {
+            e.preventDefault();
+            if (!skillsList.includes(skillInput.trim())) {
+                setSkillsList([...skillsList, skillInput.trim()]);
+            }
+            setSkillInput('');
+        }
+    };
+
+    const handleRemoveSkill = (skillToRemove) => {
+        setSkillsList(skillsList.filter(s => s !== skillToRemove));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         const data = new FormData();
+        // data.append('username', formData.username); // Assuming backend might not allow username changes, but if it does, it's here
         data.append('bio', formData.bio);
         data.append('instagram', formData.instagram);
         data.append('twitter', formData.twitter);
         data.append('portfolioLink', formData.portfolioLink);
-        data.append('skills', formData.skills);
+        data.append('skills', skillsList.join(', '));
 
         if (avatarFile) data.append('avatar', avatarFile);
         if (coverFile) data.append('coverImage', coverFile);
@@ -63,8 +79,10 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
             const res = await api.patch('/user/edit', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            setUser(res.data.data);
-            closeModal();
+            if (onUpdateSuccess) {
+                onUpdateSuccess(res.data.data);
+            }
+            if (refreshUser) refreshUser();
         } catch (err) {
             console.error("Update failed", err);
             alert("Failed to update profile.");
@@ -85,11 +103,11 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
                 </Transition.Child>
 
-                <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-4">
+                <div className="fixed inset-0 overflow-y-auto font-body-regular text-on-surface dark:text-surface-bright">
+                    <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -99,114 +117,160 @@ const EditProfileModal = ({ isOpen, closeModal, user, setUser }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-slate-900 border border-white/10 p-5 md:p-6 shadow-2xl transition-all">
-
-                                <div className="flex justify-between items-center mb-6">
-                                    <Dialog.Title as="h3" className="text-xl font-bold text-white">Edit Profile</Dialog.Title>
-                                    <button onClick={closeModal} className="p-1 rounded-full hover:bg-white/10 transition-colors">
-                                        <XMarkIcon className="w-6 h-6 text-slate-400 hover:text-white" />
+                            <Dialog.Panel className="bg-surface bright:bg-surface-bright dark:bg-inverse-surface w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                                
+                                {/* Header */}
+                                <div className="flex justify-between items-center px-6 py-4 border-b border-surface-variant dark:border-outline-variant/20">
+                                    <Dialog.Title as="h2" className="text-lg font-bold text-on-surface dark:text-surface-bright">
+                                        Edit Profile
+                                    </Dialog.Title>
+                                    <button onClick={closeModal} className="text-on-surface-variant hover:text-on-surface dark:text-outline dark:hover:text-surface-bright transition-colors rounded-full p-1">
+                                        <span className="material-symbols-outlined">close</span>
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
-
-                                    {/* 1. COVER IMAGE */}
-                                    <div className="relative w-full h-32 md:h-40 rounded-xl overflow-hidden group bg-slate-800 border border-white/10">
-                                        <img
-                                            src={coverPreview || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"}
-                                            alt="Cover"
-                                            className="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity"
-                                        />
-                                        <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <PhotoIcon className="w-8 h-8 text-white mb-1" />
-                                            <span className="text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">Change Cover</span>
-                                            <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
-                                        </label>
-                                    </div>
-
-                                    {/* 2. AVATAR */}
-                                    <div className="flex justify-center -mt-16 relative z-10">
-                                        <div className="relative group w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-4 border-slate-900 bg-slate-800">
-                                            <img
-                                                src={avatarPreview || `https://ui-avatars.com/api/?name=${user?.username}`}
-                                                alt="Avatar"
-                                                className="w-full h-full object-cover"
-                                            />
-                                            <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                                                <CameraIcon className="w-8 h-8 text-white" />
-                                                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    {/* 3. INPUTS */}
+                                {/* Body (Scrollable) */}
+                                <div className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
+                                    
+                                    {/* Visuals Preview */}
                                     <div className="space-y-4">
-                                        <div>
-                                            <label className="text-xs text-slate-400 font-medium ml-1">Bio</label>
-                                            <textarea
+                                        <h3 className="text-sm font-semibold text-on-surface-variant dark:text-outline">Profile Visuals</h3>
+                                        
+                                        <div className="relative h-32 rounded-xl overflow-hidden bg-surface-container-high group">
+                                            <img 
+                                                alt="Cover preview" 
+                                                className="w-full h-full object-cover opacity-70 transition-opacity" 
+                                                src={coverPreview || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"}
+                                            />
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <label className="px-4 py-2 bg-black/40 backdrop-blur-md text-white rounded-full border border-white/20 text-xs font-medium cursor-pointer hover:bg-black/60 transition-colors">
+                                                    Change Cover
+                                                    <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-4 -mt-10 pl-4 relative z-10">
+                                            <div className="w-20 h-20 rounded-xl border-4 border-surface dark:border-inverse-surface overflow-hidden relative group bg-surface-container-high">
+                                                <img 
+                                                    alt="Avatar preview" 
+                                                    className="w-full h-full object-cover" 
+                                                    src={avatarPreview || `https://ui-avatars.com/api/?name=${user?.username}&background=0D8ABC&color=fff`}
+                                                />
+                                                <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                    <span className="material-symbols-outlined text-white text-xl">photo_camera</span>
+                                                    <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Form Fields */}
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Username (Display Name)</label>
+                                            <input 
+                                                className="w-full px-4 py-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-all text-sm text-on-surface dark:text-surface-bright disabled:opacity-50" 
+                                                type="text" 
+                                                value={formData.username}
+                                                disabled
+                                                placeholder="Username cannot be changed here"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-end">
+                                                <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Bio</label>
+                                                <span className="text-xs text-on-surface-variant dark:text-outline">{formData.bio.length}/200</span>
+                                            </div>
+                                            <textarea 
+                                                className="w-full px-4 py-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-all text-sm text-on-surface dark:text-surface-bright resize-none" 
+                                                rows="3"
+                                                maxLength={200}
                                                 value={formData.bio}
-                                                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                                className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white text-sm outline-none focus:border-violet-500 transition-colors"
-                                                rows={3}
-                                                placeholder="Tell us about yourself..."
+                                                onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                                                placeholder="Tell us about your art..."
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-xs text-slate-400 font-medium ml-1">Skills (comma separated)</label>
-                                            <input
-                                                type="text"
-                                                value={formData.skills}
-                                                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
-                                                className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white text-sm outline-none focus:border-violet-500 transition-colors"
-                                                placeholder="e.g. React, 3D Art, Photography"
-                                            />
-                                        </div>
-                                    </div>
 
-                                    {/* 4. SOCIALS (Responsive Grid) */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs text-slate-400 font-medium ml-1">Instagram Handle</label>
-                                            <input
-                                                type="text"
-                                                value={formData.instagram}
-                                                onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                                                className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white text-sm outline-none focus:border-violet-500"
-                                                placeholder="@username"
-                                            />
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Skills & Expertise</label>
+                                            <div className="flex flex-wrap gap-2 p-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl min-h-[50px]">
+                                                {skillsList.map((skill, idx) => (
+                                                    <div key={idx} className="flex items-center gap-1 px-3 py-1 bg-surface dark:bg-inverse-surface rounded-full text-xs font-medium border border-outline-variant/30">
+                                                        {skill} 
+                                                        <span 
+                                                            onClick={() => handleRemoveSkill(skill)}
+                                                            className="material-symbols-outlined text-[14px] cursor-pointer hover:text-error"
+                                                        >
+                                                            close
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                                <input 
+                                                    className="bg-transparent border-none outline-none text-xs flex-1 py-1 min-w-[100px] text-on-surface dark:text-surface-bright placeholder-on-surface-variant dark:placeholder-outline" 
+                                                    placeholder="Add skill & press Enter..." 
+                                                    type="text"
+                                                    value={skillInput}
+                                                    onChange={(e) => setSkillInput(e.target.value)}
+                                                    onKeyDown={handleAddSkill}
+                                                />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className="text-xs text-slate-400 font-medium ml-1">Portfolio URL</label>
-                                            <input
-                                                type="text"
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Portfolio Website URL</label>
+                                            <input 
+                                                className="w-full px-4 py-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-all text-sm text-on-surface dark:text-surface-bright" 
+                                                type="url" 
                                                 value={formData.portfolioLink}
-                                                onChange={(e) => setFormData({ ...formData, portfolioLink: e.target.value })}
-                                                className="w-full bg-slate-800 border border-white/10 rounded-lg p-3 text-white text-sm outline-none focus:border-violet-500"
-                                                placeholder="https://your-site.com"
+                                                onChange={(e) => setFormData({...formData, portfolioLink: e.target.value})}
+                                                placeholder="https://yourportfolio.com"
                                             />
                                         </div>
-                                    </div>
 
-                                    {/* SUBMIT BUTTONS */}
-                                    <div className="flex gap-3 pt-2">
-                                        <button
-                                            type="button"
-                                            onClick={closeModal}
-                                            className="flex-1 py-3 rounded-xl border border-white/10 text-slate-300 font-medium hover:bg-white/5 transition-colors text-sm"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <motion.button
-                                            whileTap={{ scale: 0.98 }}
-                                            type="submit"
-                                            disabled={loading}
-                                            className="flex-1 py-3 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-500 transition-colors disabled:opacity-50 text-sm"
-                                        >
-                                            {loading ? 'Saving...' : 'Save Changes'}
-                                        </motion.button>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Instagram</label>
+                                                <input 
+                                                    className="w-full px-4 py-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-all text-sm text-on-surface dark:text-surface-bright" 
+                                                    type="text" 
+                                                    value={formData.instagram}
+                                                    onChange={(e) => setFormData({...formData, instagram: e.target.value})}
+                                                    placeholder="@username"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-on-surface-variant dark:text-outline uppercase tracking-wider">Twitter</label>
+                                                <input 
+                                                    className="w-full px-4 py-3 bg-surface-container-low dark:bg-on-background border border-surface-variant dark:border-outline-variant/30 rounded-xl focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-all text-sm text-on-surface dark:text-surface-bright" 
+                                                    type="text" 
+                                                    value={formData.twitter}
+                                                    onChange={(e) => setFormData({...formData, twitter: e.target.value})}
+                                                    placeholder="@username"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
 
-                                </form>
+                                {/* Footer */}
+                                <div className="px-6 py-4 border-t border-surface-variant dark:border-outline-variant/20 flex justify-end gap-3 bg-surface-container-lowest dark:bg-inverse-surface mt-auto">
+                                    <button 
+                                        onClick={closeModal}
+                                        className="px-5 py-2.5 rounded-full text-sm font-semibold text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-on-background transition-colors"
+                                    >
+                                        Discard
+                                    </button>
+                                    <button 
+                                        onClick={handleSubmit}
+                                        disabled={loading}
+                                        className="px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:opacity-90 transition-opacity shadow-lg shadow-fuchsia-500/20 disabled:opacity-50"
+                                    >
+                                        {loading ? 'Saving...' : 'Save Changes'}
+                                    </button>
+                                </div>
+                                
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>

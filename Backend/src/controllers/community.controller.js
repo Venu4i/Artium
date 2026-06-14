@@ -1,5 +1,6 @@
 import Community from "../models/Community.model.js";
 import crypto from "crypto";
+import Notification from "../models/Notification.model.js";
 
 // Create a new community
 export const createCommunity = async (req, res) => {
@@ -61,12 +62,31 @@ export const requestToJoin = async (req, res) => {
         const community = await Community.findById(communityId);
         if (!community) return res.status(404).json({ error: "Community not found" });
 
+        if (community.isPrivate) {
+            return res.status(403).json({ error: "This community is private and invite-only." });
+        }
+
         if (community.pendingRequests.includes(req.user._id) || community.members.includes(req.user._id)) {
             return res.status(400).json({ error: "Already requested or a member" });
         }
 
         community.pendingRequests.push(req.user._id);
         await community.save();
+
+        // Notify the community admin
+        const notif = await Notification.create({
+            user: community.admin,
+            type: "join_request",
+            owner: req.user._id,
+            community: communityId,
+            message: `${req.user.username} requested to join ${community.name}.`
+        });
+        
+        const populatedNotif = await Notification.findById(notif._id).populate("owner", "username profilePicture");
+        if (req.io) {
+            req.io.to(community.admin.toString()).emit("new-notification", populatedNotif);
+        }
+
         res.status(200).json({ message: "Request sent" });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -98,6 +118,21 @@ export const handleJoinRequest = async (req, res) => {
         }
 
         await community.save();
+
+        if (status === 'approve') {
+            const notif = await Notification.create({
+                user: request.user,
+                type: "request_accepted",
+                owner: req.user._id,
+                community: communityId,
+                message: `Your request to join ${community.name} has been accepted.`
+            });
+            const populatedNotif = await Notification.findById(notif._id).populate("owner", "username profilePicture");
+            if (req.io) {
+                req.io.to(request.user.toString()).emit("new-notification", populatedNotif);
+            }
+        }
+
         res.status(200).json({ 
             success: true, 
             message: `Request ${status === 'approve' ? 'approved' : 'rejected'}` 
@@ -230,6 +265,65 @@ export const getLeaderboard = async (req, res) => {
         }));
 
         res.status(200).json({ leaderboard: membersData });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get recent activity (notifications) for a community
+export const getCommunityActivity = async (req, res) => {
+    try {
+        const { communityId } = req.params;
+        const community = await Community.findById(communityId);
+        if (!community) return res.status(404).json({ error: "Community not found" });
+
+        // Fetch notifications related to this community
+        const activity = await Notification.find({ community: communityId })
+            .sort({ createdAt: -1 })
+            .populate("owner", "username profilePicture")
+            .limit(20);
+
+        res.status(200).json({ activity });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Update a community
+export const updateCommunity = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description } = req.body;
+        
+        const community = await Community.findById(id);
+        if (!community) return res.status(404).json({ error: "Community not found" });
+
+        // Verify admin
+        if (community.admin.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: "Only the admin can edit this community" });
+        }
+
+        // Handle uploaded files (avatar, coverImage)
+        let avatarUrl = community.avatar;
+        let coverImageUrl = community.coverImage;
+
+        if (req.files) {
+            if (req.files.avatar && req.files.avatar.length > 0) {
+                avatarUrl = req.files.avatar[0].path;
+            }
+            if (req.files.coverImage && req.files.coverImage.length > 0) {
+                coverImageUrl = req.files.coverImage[0].path;
+            }
+        }
+
+        community.name = name || community.name;
+        community.description = description !== undefined ? description : community.description;
+        community.avatar = avatarUrl;
+        community.coverImage = coverImageUrl;
+
+        await community.save();
+
+        res.status(200).json({ success: true, community });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

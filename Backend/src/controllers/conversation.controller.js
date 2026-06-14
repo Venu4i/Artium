@@ -39,7 +39,7 @@ export const getMyConversations = async (req, res, next) => {
     const conversations = await Conversation.find({
       participants: myId,
     })
-      .populate("participants", "username avatar")
+      .populate("participants", "username profilePicture")
       .populate("lastMessage")
       .sort({ updatedAt: -1 });
 
@@ -81,7 +81,7 @@ export const getRandomDiscoveryUsers = async (req, res, next) => {
     const discoveryUsers = await User.find({
       _id: { $nin: excludedIds }
     })
-      .select("username avatar bio")
+      .select("username profilePicture bio")
       .limit(10);
 
     console.log("Discovery Users:", discoveryUsers);
