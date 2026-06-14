@@ -65,6 +65,7 @@ const MyCommunities = () => {
         >
             <h3 className="text-lg font-semibold text-white">{community.name}</h3>
             <p className="text-sm text-gray-400">{community.description}</p>
+            <p className="text-xs text-zinc-500 mt-1 mb-2">Admin: <span className="text-violet-400">{community.admin?.username || "Unknown"}</span></p>
             {action}
         </div>
     );

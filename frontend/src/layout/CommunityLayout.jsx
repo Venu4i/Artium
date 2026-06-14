@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Outlet, NavLink, useParams, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, Link, useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTheme } from "../context/ThemeContext";
 import communityService from "../services/communityService";
@@ -97,10 +97,10 @@ const CommunityLayout = () => {
                             {theme === 'dark' ? 'light_mode' : 'dark_mode'}
                         </span>
                     </button>
-                    <button aria-label="Notifications" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center">
+                    <Link to="/notifications" aria-label="Notifications" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-center">
                         <span className="material-symbols-outlined text-community-on-surface">notifications</span>
-                    </button>
-                    <div className="ml-1 w-10 h-10 rounded-full overflow-hidden border border-black/10 dark:border-white/10 cursor-pointer">
+                    </Link>
+                    <div onClick={() => navigate('/profile')} className="ml-1 w-10 h-10 rounded-full overflow-hidden border border-black/10 dark:border-white/10 cursor-pointer">
                         <img 
                             alt="Profile Avatar" 
                             className="w-full h-full object-cover" 

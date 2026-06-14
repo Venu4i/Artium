@@ -229,9 +229,7 @@ export default function AuthPage() {
                       />
                       <label
                         htmlFor="username"
-                        className={`absolute left-4 transition-all duration-300 pointer-events-none 
-                          ${formData.username ? '-top-2 left-3 text-[12px] font-medium tracking-wide bg-[#050408] px-1 text-[#4cd7f6]' : 'top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1'}
-                        `}
+                        className="absolute left-4 transition-all duration-300 pointer-events-none z-10 top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:left-3 peer-[&:not(:placeholder-shown)]:text-[12px] peer-[&:not(:placeholder-shown)]:font-medium peer-[&:not(:placeholder-shown)]:tracking-wide peer-[&:not(:placeholder-shown)]:text-[#4cd7f6] peer-[&:not(:placeholder-shown)]:bg-[#050408] peer-[&:not(:placeholder-shown)]:px-1"
                       >
                         Username
                       </label>
@@ -253,9 +251,7 @@ export default function AuthPage() {
                   />
                   <label
                     htmlFor="email"
-                    className={`absolute left-4 transition-all duration-300 pointer-events-none 
-                      ${formData.email ? '-top-2 left-3 text-[12px] font-medium tracking-wide bg-[#050408] px-1 text-[#4cd7f6]' : 'top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1'}
-                    `}
+                    className="absolute left-4 transition-all duration-300 pointer-events-none z-10 top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:left-3 peer-[&:not(:placeholder-shown)]:text-[12px] peer-[&:not(:placeholder-shown)]:font-medium peer-[&:not(:placeholder-shown)]:tracking-wide peer-[&:not(:placeholder-shown)]:text-[#4cd7f6] peer-[&:not(:placeholder-shown)]:bg-[#050408] peer-[&:not(:placeholder-shown)]:px-1"
                   >
                     {isLogin ? "Email or Username" : "Email Address"}
                   </label>
@@ -275,9 +271,7 @@ export default function AuthPage() {
                   />
                   <label
                     htmlFor="password"
-                    className={`absolute left-4 transition-all duration-300 pointer-events-none 
-                      ${formData.password ? '-top-2 left-3 text-[12px] font-medium tracking-wide bg-[#050408] px-1 text-[#4cd7f6]' : 'top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1'}
-                    `}
+                    className="absolute left-4 transition-all duration-300 pointer-events-none z-10 top-4 text-lg text-[#ccc3d8] peer-focus:-top-2 peer-focus:left-3 peer-focus:text-[12px] peer-focus:font-medium peer-focus:tracking-wide peer-focus:text-[#4cd7f6] peer-focus:bg-[#050408] peer-focus:px-1 peer-[&:not(:placeholder-shown)]:-top-2 peer-[&:not(:placeholder-shown)]:left-3 peer-[&:not(:placeholder-shown)]:text-[12px] peer-[&:not(:placeholder-shown)]:font-medium peer-[&:not(:placeholder-shown)]:tracking-wide peer-[&:not(:placeholder-shown)]:text-[#4cd7f6] peer-[&:not(:placeholder-shown)]:bg-[#050408] peer-[&:not(:placeholder-shown)]:px-1"
                   >
                     Password
                   </label>

@@ -114,6 +114,9 @@ const ExploreCommunities = () => {
                                     <h3 className="text-white text-lg font-bold group-hover:text-violet-400 transition-colors">
                                         {community.name}
                                     </h3>
+                                    <p className="text-zinc-500 text-xs mt-1">
+                                        Admin: <span className="text-violet-400">{community.admin?.username || "Unknown"}</span>
+                                    </p>
                                     
                                     <p className="text-zinc-400 text-sm mt-2 line-clamp-2 flex-1">
                                         {community.description}
@@ -134,7 +137,7 @@ const ExploreCommunities = () => {
                                                 : 'bg-white text-black hover:bg-violet-500 hover:text-white shadow-xl hover:shadow-violet-500/40'
                                             }`}
                                         >
-                                            {community.isPrivate ? 'Invite Only' : isPending ? 'Sending...' : alreadyRequested ? 'Requested' : 'Join Studio'}
+                                            {community.isPrivate ? 'Invite Only' : isPending ? 'Sending...' : alreadyRequested ? 'Sent' : 'Join Studio'}
                                         </button>
                                     </div>
                                 </motion.div>

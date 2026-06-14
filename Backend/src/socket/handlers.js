@@ -34,6 +34,11 @@ const registerSocketHandlers = (io, socket) => {
         attachments,
     } = data;
 
+    if (!receiver) {
+        console.error("❌ socket.on('send-message'): receiver is missing!");
+        return;
+    }
+
     const message = await Message.create({
         sender: socket.user._id,
         receiver,

@@ -97,11 +97,11 @@ export default function AiAssistantPage() {
 
             <div className="mb-10">
 
-                <h1 className="text-5xl font-black text-white mb-3">
+                <h1 className="text-5xl font-black text-zinc-900 dark:text-white mb-3">
                     AI Studio
                 </h1>
 
-                <p className="text-slate-400 text-lg">
+                <p className="text-zinc-500 dark:text-slate-400 text-lg">
                     Enhance creativity with AI powered mentoring.
                 </p>
 
@@ -117,8 +117,8 @@ export default function AiAssistantPage() {
                     }
                     className={`px-6 py-3 rounded-xl font-semibold transition ${
                         activeTab === "feedback"
-                            ? "bg-violet-600 text-white"
-                            : "bg-slate-900 text-slate-400"
+                            ? "bg-cyan-600 text-zinc-900 dark:text-white"
+                            : "bg-zinc-100 dark:bg-slate-900 shadow-inner text-zinc-500 dark:text-slate-400"
                     }`}
                 >
                     🎨 Art Feedback
@@ -130,8 +130,8 @@ export default function AiAssistantPage() {
                     }
                     className={`px-6 py-3 rounded-xl font-semibold transition ${
                         activeTab === "ideas"
-                            ? "bg-cyan-600 text-white"
-                            : "bg-slate-900 text-slate-400"
+                            ? "bg-cyan-600 text-zinc-900 dark:text-white"
+                            : "bg-zinc-100 dark:bg-slate-900 shadow-inner text-zinc-500 dark:text-slate-400"
                     }`}
                 >
                     💡 Creative Ideas
@@ -162,9 +162,9 @@ export default function AiAssistantPage() {
                             className="space-y-6"
                         >
 
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+                            <div className="bg-white dark:bg-white/5 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-3xl p-6">
 
-                                <h2 className="text-2xl font-bold text-white mb-6">
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-6">
                                     Artwork Analysis
                                 </h2>
 
@@ -177,7 +177,7 @@ export default function AiAssistantPage() {
                                         )
                                     }
                                     placeholder="Describe your artwork..."
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white"
+                                    className="w-full bg-white dark:bg-black/30 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 rounded-xl p-4 text-zinc-900 dark:text-white"
                                 />
 
                                 <div className="grid md:grid-cols-2 gap-4 mt-4">
@@ -191,7 +191,7 @@ export default function AiAssistantPage() {
                                             )
                                         }
                                         placeholder="Art Type"
-                                        className="bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+                                        className="bg-white dark:bg-black/30 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 rounded-xl p-3 text-zinc-900 dark:text-white"
                                     />
 
                                     <select
@@ -201,7 +201,7 @@ export default function AiAssistantPage() {
                                                 e.target.value
                                             )
                                         }
-                                        className="bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+                                        className="bg-white dark:bg-black/30 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 rounded-xl p-3 text-zinc-900 dark:text-white"
                                     >
                                         <option>
                                             Professional
@@ -222,7 +222,7 @@ export default function AiAssistantPage() {
                                 <button
                                     onClick={getFeedback}
                                     disabled={loading}
-                                    className="mt-6 px-8 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold"
+                                    className="mt-6 px-8 py-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-900 dark:text-white font-bold"
                                 >
                                     {
                                         loading
@@ -309,9 +309,9 @@ export default function AiAssistantPage() {
                             className="space-y-6"
                         >
 
-                            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6">
+                            <div className="bg-white dark:bg-white/5 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-3xl p-6">
 
-                                <h2 className="text-2xl font-bold text-white mb-6">
+                                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-6">
                                     Generate Creative Ideas
                                 </h2>
 
@@ -323,7 +323,7 @@ export default function AiAssistantPage() {
                                         )
                                     }
                                     placeholder="Topic..."
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white"
+                                    className="w-full bg-white dark:bg-black/30 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 rounded-xl p-4 text-zinc-900 dark:text-white"
                                 />
 
                                 <input
@@ -334,13 +334,13 @@ export default function AiAssistantPage() {
                                         )
                                     }
                                     placeholder="Art Type..."
-                                    className="w-full mt-4 bg-black/30 border border-white/10 rounded-xl p-4 text-white"
+                                    className="w-full mt-4 bg-white dark:bg-black/30 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 rounded-xl p-4 text-zinc-900 dark:text-white"
                                 />
 
                                 <button
                                     onClick={generateIdeas}
                                     disabled={loading}
-                                    className="mt-6 px-8 py-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold"
+                                    className="mt-6 px-8 py-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-900 dark:text-white font-bold"
                                 >
                                     {
                                         loading
@@ -372,13 +372,13 @@ export default function AiAssistantPage() {
                                                             opacity: 1,
                                                             y: 0
                                                         }}
-                                                        className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-xl"
+                                                        className="bg-white dark:bg-white/5 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 border border-zinc-200 dark:border-white/10 rounded-2xl p-5 backdrop-blur-xl"
                                                     >
                                                         <div className="text-cyan-400 font-bold mb-2">
                                                             Idea #{index + 1}
                                                         </div>
 
-                                                        <p className="text-slate-300">
+                                                        <p className="text-zinc-600 dark:text-slate-300">
                                                             {idea}
                                                         </p>
                                                     </motion.div>
@@ -402,12 +402,12 @@ export default function AiAssistantPage() {
 
 function Card({ title, content }) {
     return (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-xl">
-            <h3 className="text-lg font-bold text-white mb-3">
+        <div className="bg-white dark:bg-white/5 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 border border-zinc-200 dark:border-white/10 rounded-2xl p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-3">
                 {title}
             </h3>
 
-            <p className="text-slate-300">
+            <p className="text-zinc-600 dark:text-slate-300">
                 {content}
             </p>
         </div>
@@ -416,8 +416,8 @@ function Card({ title, content }) {
 
 function ListCard({ title, items }) {
     return (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-xl">
-            <h3 className="text-lg font-bold text-white mb-3">
+        <div className="bg-white dark:bg-white/5 shadow-sm dark:shadow-none border border-zinc-200 dark:border-white/10 border border-zinc-200 dark:border-white/10 rounded-2xl p-5 backdrop-blur-xl">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-3">
                 {title}
             </h3>
 
@@ -426,7 +426,7 @@ function ListCard({ title, items }) {
                 {items?.map((item, index) => (
                     <li
                         key={index}
-                        className="text-slate-300"
+                        className="text-zinc-600 dark:text-slate-300"
                     >
                         • {item}
                     </li>

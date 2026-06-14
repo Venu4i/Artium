@@ -69,53 +69,53 @@ const HallOfFame = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-3/4 bg-rose-500/20 dark:bg-rose-500/10 blur-[80px] rounded-full pointer-events-none z-0"></div>
                 <div className="flex items-end gap-2 md:gap-6 z-10">
                     {/* Rank 2: Silver */}
-                    {rank2 && (
+                    {true && (
                         <div 
                             className="flex flex-col items-center group cursor-pointer transition-transform hover:-translate-y-2"
-                            onClick={() => setSelectedUser(rank2)}
+                            onClick={() => rank2 && setSelectedUser(rank2)}
                         >
                             <div className="relative mb-3">
-                                <img alt="Silver Rank" className="w-[72px] h-[72px] rounded-full border-4 border-slate-300 dark:border-slate-500 bg-white dark:bg-zinc-800 object-cover" src={rank2.avatar}/>
+                                <img alt="Silver Rank" className="w-[72px] h-[72px] rounded-full border-4 border-slate-300 dark:border-slate-500 bg-white dark:bg-zinc-800 object-cover" src={rank2?.avatar || 'https://via.placeholder.com/150/e2e8f0/94a3b8?text=?'}/>
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-300 dark:bg-slate-500 text-slate-900 px-2 rounded font-bold text-xs">#2</div>
                             </div>
                             <div className="h-[100px] w-24 md:w-32 bg-slate-200/50 dark:bg-slate-500/20 backdrop-blur border-t border-slate-300 dark:border-slate-500/40 flex flex-col items-center justify-start pt-2 rounded-t-xl">
-                                <span className="font-bold text-slate-700 dark:text-slate-300 truncate w-full text-center px-1">{rank2.username}</span>
-                                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">{rank2.globalPoints.toLocaleString()} PTS</span>
+                                <span className="font-bold text-slate-700 dark:text-slate-300 truncate w-full text-center px-1">{rank2?.username || 'Unclaimed'}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">{rank2 ? rank2.globalPoints.toLocaleString() : 0} PTS</span>
                             </div>
                         </div>
                     )}
 
                     {/* Rank 1: Gold */}
-                    {rank1 && (
+                    {true && (
                         <div 
                             className="flex flex-col items-center group cursor-pointer transition-transform hover:-translate-y-4"
-                            onClick={() => setSelectedUser(rank1)}
+                            onClick={() => rank1 && setSelectedUser(rank1)}
                         >
                             <div className="relative mb-3 scale-110">
-                                <img alt="Gold Rank" className="w-[96px] h-[96px] rounded-full border-4 border-amber-400 bg-white dark:bg-zinc-800 shadow-[0_0_30px_rgba(251,191,36,0.3)] object-cover" src={rank1.avatar}/>
+                                <img alt="Gold Rank" className="w-[96px] h-[96px] rounded-full border-4 border-amber-400 bg-white dark:bg-zinc-800 shadow-[0_0_30px_rgba(251,191,36,0.3)] object-cover" src={rank1?.avatar || 'https://via.placeholder.com/150/fef3c7/d97706?text=?'}/>
                                 <span className="material-symbols-outlined absolute -top-8 left-1/2 -translate-x-1/2 text-amber-400 text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
                             </div>
                             <div className="h-[140px] w-32 md:w-48 bg-amber-100 dark:bg-amber-400/20 backdrop-blur border-t border-amber-400/40 flex flex-col items-center justify-start pt-4 rounded-t-2xl shadow-xl dark:shadow-2xl">
-                                <span className="font-display text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500 truncate w-full text-center px-2">{rank1.username}</span>
-                                <span className="text-sm font-bold text-amber-600 dark:text-amber-200 font-mono mt-1">{rank1.globalPoints.toLocaleString()} PTS</span>
+                                <span className="font-display text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500 truncate w-full text-center px-2">{rank1?.username || 'Unclaimed'}</span>
+                                <span className="text-sm font-bold text-amber-600 dark:text-amber-200 font-mono mt-1">{rank1 ? rank1.globalPoints.toLocaleString() : 0} PTS</span>
                                 <div className="mt-4 px-3 py-1 bg-amber-400/10 rounded-full border border-amber-400/30 text-[10px] text-amber-600 dark:text-amber-400 tracking-widest uppercase font-bold">Global Champion</div>
                             </div>
                         </div>
                     )}
 
                     {/* Rank 3: Bronze */}
-                    {rank3 && (
+                    {true && (
                         <div 
                             className="flex flex-col items-center group cursor-pointer transition-transform hover:-translate-y-2"
-                            onClick={() => setSelectedUser(rank3)}
+                            onClick={() => rank3 && setSelectedUser(rank3)}
                         >
                             <div className="relative mb-3">
-                                <img alt="Bronze Rank" className="w-[64px] h-[64px] rounded-full border-4 border-amber-700 bg-white dark:bg-zinc-800 object-cover" src={rank3.avatar}/>
+                                <img alt="Bronze Rank" className="w-[64px] h-[64px] rounded-full border-4 border-amber-700 bg-white dark:bg-zinc-800 object-cover" src={rank3?.avatar || 'https://via.placeholder.com/150/fef3c7/b45309?text=?'}/>
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-700 text-white px-2 rounded font-bold text-xs">#3</div>
                             </div>
                             <div className="h-[80px] w-24 md:w-32 bg-amber-100/50 dark:bg-amber-700/20 backdrop-blur border-t border-amber-300 dark:border-amber-700/40 flex flex-col items-center justify-start pt-2 rounded-t-xl">
-                                <span className="font-bold text-amber-800 dark:text-amber-600 truncate w-full text-center px-1">{rank3.username}</span>
-                                <span className="text-xs text-amber-700 dark:text-amber-700 font-mono mt-1">{rank3.globalPoints.toLocaleString()} PTS</span>
+                                <span className="font-bold text-amber-800 dark:text-amber-600 truncate w-full text-center px-1">{rank3?.username || 'Unclaimed'}</span>
+                                <span className="text-xs text-amber-700 dark:text-amber-700 font-mono mt-1">{rank3 ? rank3.globalPoints.toLocaleString() : 0} PTS</span>
                             </div>
                         </div>
                     )}

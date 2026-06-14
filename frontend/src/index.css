@@ -90,6 +90,15 @@
   body {
     @apply antialiased;
   }
+
+  /* Globally hide scrollbars from anywhere on the site */
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  *::-webkit-scrollbar {
+    display: none !important;
+  }
   
   :root {
     /* Light Theme variants for Community UI */

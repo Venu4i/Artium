@@ -37,7 +37,7 @@ const CommunityPantheon = () => {
 
     return (
         <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 w-full h-full pb-32">
-            <div className="w-full max-w-6xl mx-auto px-4 md:px-10 pt-10 flex flex-col gap-8">
+            <div className="w-full max-w-6xl mx-auto px-4 md:px-10 pt-2 flex flex-col gap-8">
                 
                 {/* Status Banner */}
                 <div className="bg-community-surface/40 dark:bg-community-surface-dim/40 border border-community-secondary/30 rounded-xl p-4 flex items-center gap-3 shadow-lg backdrop-blur-md">
@@ -48,17 +48,17 @@ const CommunityPantheon = () => {
                 {/* Podium Section (Ranks 1-3) */}
                 <div className="flex justify-center items-end h-[350px] mt-12 mb-8 gap-4 md:gap-6 relative">
                     {/* Rank 2 (Silver) */}
-                    {rank2 && (
+                    {true && (
                         <div className="flex flex-col items-center z-10">
                             <div className="relative mb-4 group cursor-pointer">
                                 <div className="w-[60px] h-[60px] rounded-full p-[2px] bg-gradient-to-b from-gray-300 to-gray-500 shadow-[0_0_20px_rgba(209,213,219,0.3)] group-hover:scale-105 transition-transform">
-                                    <img alt="Rank 2 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank2.avatar} />
+                                    <img alt="Rank 2 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank2?.avatar || 'https://ui-avatars.com/api/?name=2&background=e2e8f0&color=94a3b8'} />
                                 </div>
                                 <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-gray-300 text-black flex items-center justify-center font-data-mono text-[12px] font-bold border-2 border-community-background">2</div>
                             </div>
                             <div className="text-center mb-4">
-                                <div className="font-headline text-[18px] text-community-on-surface font-bold">{rank2.name}</div>
-                                <div className="font-data-mono text-[14px] text-gray-400 font-bold">{(rank2.points / 1000).toFixed(1)}k pts</div>
+                                <div className="font-headline text-[18px] text-community-on-surface font-bold">{rank2?.name || 'Unclaimed'}</div>
+                                <div className="font-data-mono text-[14px] text-gray-400 font-bold">{rank2 ? (rank2.points / 1000).toFixed(1) : 0}k pts</div>
                             </div>
                             <div className="w-24 md:w-32 h-[160px] bg-gradient-to-t from-community-container-highest to-community-surface border-t border-x border-white/10 rounded-t-2xl relative overflow-hidden flex flex-col justify-end pb-8 items-center">
                                 <div className="absolute inset-0 bg-gradient-to-b from-gray-400/20 to-transparent"></div>
@@ -68,18 +68,18 @@ const CommunityPantheon = () => {
                     )}
 
                     {/* Rank 1 (Gold) */}
-                    {rank1 && (
+                    {true && (
                         <div className="flex flex-col items-center z-20">
                             <div className="relative mb-6 group cursor-pointer">
                                 <span className="material-symbols-outlined absolute -top-10 left-1/2 -translate-x-1/2 text-yellow-400 text-4xl drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">workspace_premium</span>
                                 <div className="w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-b from-yellow-400 to-amber-600 shadow-[0_0_30px_rgba(250,204,21,0.4)] group-hover:scale-105 transition-transform">
-                                    <img alt="Rank 1 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank1.avatar} />
+                                    <img alt="Rank 1 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank1?.avatar || 'https://ui-avatars.com/api/?name=1&background=fef3c7&color=d97706'} />
                                 </div>
                                 <div className="absolute -bottom-3 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 text-black flex items-center justify-center font-data-mono text-[14px] font-bold border-2 border-community-background">1</div>
                             </div>
                             <div className="text-center mb-6">
-                                <div className="font-headline text-[20px] text-community-on-surface font-bold">{rank1.name}</div>
-                                <div className="font-data-mono text-[14px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-community-secondary to-community-tertiary drop-shadow-md">{(rank1.points / 1000).toFixed(1)}k pts</div>
+                                <div className="font-headline text-[20px] text-community-on-surface font-bold">{rank1?.name || 'Unclaimed'}</div>
+                                <div className="font-data-mono text-[14px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-community-secondary to-community-tertiary drop-shadow-md">{rank1 ? (rank1.points / 1000).toFixed(1) : 0}k pts</div>
                             </div>
                             <div className="w-28 md:w-40 h-[220px] bg-gradient-to-t from-community-container-highest to-community-surface rounded-t-2xl border-t border-x border-yellow-500/30 relative overflow-hidden flex flex-col justify-end pb-12 items-center shadow-[0_-10px_40px_-10px_rgba(250,204,21,0.15)]">
                                 <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/20 to-transparent"></div>
@@ -90,17 +90,17 @@ const CommunityPantheon = () => {
                     )}
 
                     {/* Rank 3 (Bronze) */}
-                    {rank3 && (
+                    {true && (
                         <div className="flex flex-col items-center z-10">
                             <div className="relative mb-4 group cursor-pointer">
                                 <div className="w-[60px] h-[60px] rounded-full p-[2px] bg-gradient-to-b from-amber-600 to-amber-800 shadow-[0_0_20px_rgba(217,119,6,0.3)] group-hover:scale-105 transition-transform">
-                                    <img alt="Rank 3 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank3.avatar} />
+                                    <img alt="Rank 3 Avatar" className="w-full h-full rounded-full object-cover border-2 border-community-background" src={rank3?.avatar || 'https://ui-avatars.com/api/?name=3&background=ffedd5&color=b45309'} />
                                 </div>
                                 <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-amber-600 text-black flex items-center justify-center font-data-mono text-[12px] font-bold border-2 border-community-background">3</div>
                             </div>
                             <div className="text-center mb-4">
-                                <div className="font-headline text-[18px] text-community-on-surface font-bold">{rank3.name}</div>
-                                <div className="font-data-mono text-[14px] text-amber-500 font-bold">{(rank3.points / 1000).toFixed(1)}k pts</div>
+                                <div className="font-headline text-[18px] text-community-on-surface font-bold">{rank3?.name || 'Unclaimed'}</div>
+                                <div className="font-data-mono text-[14px] text-amber-500 font-bold">{rank3 ? (rank3.points / 1000).toFixed(1) : 0}k pts</div>
                             </div>
                             <div className="w-24 md:w-32 h-[120px] bg-gradient-to-t from-community-container-highest to-community-surface rounded-t-2xl border-t border-x border-white/10 relative overflow-hidden flex flex-col justify-end pb-6 items-center">
                                 <div className="absolute inset-0 bg-gradient-to-b from-amber-700/20 to-transparent"></div>

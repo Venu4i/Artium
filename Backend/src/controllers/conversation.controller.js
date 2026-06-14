@@ -11,7 +11,7 @@ export const getOrCreateConversation = async (req, res, next) => {
 
     let conversation = await Conversation.findOne({
       participants: { $all: [myId, userId] },
-    });
+    }).populate("participants", "username profilePicture");
 
     if (!conversation) {
       conversation = await Conversation.create({
@@ -21,6 +21,7 @@ export const getOrCreateConversation = async (req, res, next) => {
           [userId]: 0,
         },
       });
+      conversation = await conversation.populate("participants", "username profilePicture");
     }
 
     res.status(200).json({

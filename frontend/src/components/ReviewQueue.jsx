@@ -129,7 +129,7 @@ const ReviewQueue = ({ challenge, onBack }) => {
                                     />
                                     <div>
                                         <p className="font-bold text-community-on-surface">{sub.submittedBy?.username}</p>
-                                        <p className="text-xs text-community-outline font-data-mono">
+                                        <p className="text-xs text-gray-400 text-community-outline font-data-mono">
                                             Sub: {formatDistanceToNow(new Date(sub.createdAt))} ago
                                         </p>
                                     </div>
@@ -156,18 +156,18 @@ const ReviewQueue = ({ challenge, onBack }) => {
                                             <div className="flex gap-2 w-full">
                                                 <div className="relative w-24">
                                                     <input 
-                                                        className="w-full bg-black/40 border border-community-outline/20 rounded-lg py-2 px-3 text-center font-data-mono focus:border-community-tertiary focus:ring-0 transition-colors text-community-on-surface" 
+                                                        className="w-full bg-gray-300 dark:bg-gray-500 border border-community-outline/20 rounded-lg py-2 px-3 text-center font-data-mono focus:border-community-tertiary focus:ring-0 transition-colors text-community-on-surface" 
                                                         max={challenge.maxPoints} 
                                                         placeholder="0" 
                                                         type="number"
                                                         value={state.pointsAwarded}
                                                         onChange={(e) => updateState(sub._id, 'pointsAwarded', e.target.value)}
                                                     />
-                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-community-outline font-bold">PTS</span>
+                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-community-outline font-bold text-gray-400">PTS</span>
                                                 </div>
                                                 <input 
                                                     type="text" 
-                                                    className="flex-1 bg-black/40 border border-community-outline/20 rounded-lg py-2 px-3 text-sm text-community-on-surface focus:border-community-tertiary focus:ring-0 transition-colors"
+                                                    className="flex-1 bg-gray-300 dark:bg-gray-500 border border-community-outline/20 rounded-lg py-2 px-3 text-sm text-community-on-surface focus:border-community-tertiary focus:ring-0 transition-colors"
                                                     placeholder="Remarks / Note..."
                                                     value={state.rejectionNote}
                                                     onChange={(e) => updateState(sub._id, 'rejectionNote', e.target.value)}
