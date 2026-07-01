@@ -8,7 +8,8 @@ const AdminManagementDrawer = ({
     currentUser, 
     onClose, 
     onAcceptRequest, 
-    onRejectRequest 
+    onRejectRequest,
+    onInviteGenerated
 }) => {
     const [inviteLink, setInviteLink] = useState("");
     const [copied, setCopied] = useState(false);
@@ -49,8 +50,14 @@ const AdminManagementDrawer = ({
     const handleGenerateInvite = async () => {
         try {
             const link = await communityService.generateInviteLink(community._id, currentUser.email);
-            setInviteLink(link.inviteLink || link);
+            const linkString = link.inviteLink || link;
+            setInviteLink(linkString);
             setCopied(false);
+            
+            if (onInviteGenerated) {
+                const token = linkString.split('/').pop();
+                onInviteGenerated({ token, status: 'pending' });
+            }
         } catch (error) {
             console.error("Failed to generate invite link", error);
             alert("Failed to generate invite link.");

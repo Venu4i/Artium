@@ -98,7 +98,7 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
                     value={artType}
                     onChange={(e) => setArtType(e.target.value)}
                     placeholder="Art Type (Digital Painting, Photography...)"
-                    className="w-full bg-black/40 rounded-xl py-2 px-4 text-sm"
+                    className="w-full bg-black/40 border-none rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all"
                 />
 
                 <textarea
@@ -106,7 +106,7 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
                     onChange={(e) => setAiDescription(e.target.value)}
                     placeholder="Theme or idea..."
                     rows={2}
-                    className="w-full bg-black/40 rounded-xl py-2 px-4 text-sm"
+                    className="w-full bg-black/40 border-none rounded-xl py-2 px-4 text-sm text-community-on-surface focus:ring-2 focus:ring-community-secondary transition-all"
                 />
 
                 <button
