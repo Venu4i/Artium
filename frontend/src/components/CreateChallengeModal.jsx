@@ -12,6 +12,10 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
     const [mediaType, setMediaType] = useState("Image");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [artType, setArtType] = useState("");
+    const [aiDescription, setAiDescription] = useState("");
+    const [generatedChallenges, setGeneratedChallenges] = useState(null);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const handleSubmit = async () => {
         if (!title || !description || !deadline) {
@@ -40,6 +44,29 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
         }
     };
 
+    const handleGenerateAI = async () => {
+        if (!artType || !aiDescription) {
+            setError("Please enter art type and description.");
+            return;
+        }
+
+        try {
+            setIsGenerating(true);
+            setError(null);
+
+            const res = await challengeService.generateArtChallenge({
+                artType,
+                description: aiDescription,
+            });
+
+            setGeneratedChallenges(res.data);
+        } catch (err) {
+            setError("Failed to generate challenge");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     const modalContent = (
@@ -60,6 +87,73 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
                         </h3>
                         <button onClick={onClose} className="text-community-outline hover:text-white transition-colors material-symbols-outlined">close</button>
                     </div>
+
+            <div className="space-y-3 border border-white/10 rounded-xl p-4 bg-black/20">
+
+                <h4 className="text-sm font-semibold text-white">
+                    ✨ Generate Challenge with AI
+                </h4>
+
+                <input
+                    value={artType}
+                    onChange={(e) => setArtType(e.target.value)}
+                    placeholder="Art Type (Digital Painting, Photography...)"
+                    className="w-full bg-black/40 rounded-xl py-2 px-4 text-sm"
+                />
+
+                <textarea
+                    value={aiDescription}
+                    onChange={(e) => setAiDescription(e.target.value)}
+                    placeholder="Theme or idea..."
+                    rows={2}
+                    className="w-full bg-black/40 rounded-xl py-2 px-4 text-sm"
+                />
+
+                <button
+                    onClick={handleGenerateAI}
+                    disabled={isGenerating}
+                    className="px-4 py-2 rounded-full bg-community-tertiary text-white text-sm"
+                >
+                    {isGenerating ? "Generating..." : "Generate"}
+                </button>
+
+            </div>
+
+            {generatedChallenges && (
+                <div className="space-y-3">
+
+                    {["easy", "medium", "hard"].map(level => (
+                        <div
+                            key={level}
+                            className="p-3 rounded-xl bg-black/30 border border-white/10"
+                        >
+                            <div className="flex justify-between items-center">
+
+                                <h4 className="capitalize font-semibold text-community-secondary">
+                                    {level}
+                                </h4>
+
+                                <button
+                                    onClick={() => {
+                                        setTitle(`${level.toUpperCase()} Challenge`);
+                                        setDescription(generatedChallenges[level]);
+                                    }}
+                                    className="text-xs px-3 py-1 rounded-full bg-community-secondary text-white"
+                                >
+                                    Use
+                                </button>
+
+                            </div>
+
+                            <p className="text-sm mt-2 text-community-on-surface">
+                                {generatedChallenges[level]}
+                            </p>
+
+                        </div>
+                    ))}
+
+                </div>
+            )}
 
                     <div className="space-y-4 relative z-10">
                         <div className="space-y-1">

@@ -45,6 +45,11 @@ const challengeService = {
         }
     },
 
+    generateArtChallenge: async (data) => {
+        const res = await api.post("/art-challenge", data);
+        return res.data;
+    },
+
     // Admin: Get Challenge Details (includes submissions for Review Queue)
     getChallengeDetails: async (challengeId) => {
         try {
