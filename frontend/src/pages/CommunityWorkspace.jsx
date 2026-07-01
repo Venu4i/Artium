@@ -264,6 +264,12 @@ const CommunityWorkspace = () => {
                 onClose={() => setActiveDrawerTab(null)}
                 onAcceptRequest={handleAcceptRequest}
                 onRejectRequest={handleRejectRequest}
+                onInviteGenerated={(newInvite) => {
+                    setLocalCommunity(prev => ({
+                        ...prev,
+                        invites: [...(prev.invites || []), newInvite]
+                    }));
+                }}
             />
 
             <EditCommunityModal
