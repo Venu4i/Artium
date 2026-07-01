@@ -26,16 +26,16 @@ const Chat = ({ activeConversation, currentUser }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-950/40 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full">
       {/* Artist Header */}
-      <header className="p-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
+      <header className="p-4 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between rounded-t-2xl">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-400 p-[1.5px]">
-             <img src={targetArtist?.profilePicture || targetArtist?.avatar} className="w-full h-full rounded-full bg-zinc-900 object-cover" alt="artist" />
+             <img src={targetArtist?.profilePicture || targetArtist?.avatar} className="w-full h-full rounded-full bg-slate-200 dark:bg-zinc-900 object-cover" alt="artist" />
           </div>
           <div>
-            <h3 className="text-slate-100 font-semibold">{targetArtist?.username}</h3>
-            <p className="text-[10px] text-cyan-400 uppercase tracking-widest font-bold">Collaborator</p>
+            <h3 className="text-slate-900 dark:text-slate-100 font-semibold">{targetArtist?.username}</h3>
+            <p className="text-[10px] text-cyan-500 dark:text-cyan-400 uppercase tracking-widest font-bold">Collaborator</p>
           </div>
         </div>
       </header>
@@ -53,10 +53,10 @@ const Chat = ({ activeConversation, currentUser }) => {
                 animate={{ opacity: 1, x: 0 }}
                 className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-[70%] p-3 px-5 rounded-2xl text-[14px] shadow-lg ${
+                <div className={`max-w-[70%] p-3 px-5 rounded-2xl text-[14px] shadow-sm dark:shadow-lg ${
                   isMe 
                     ? 'bg-violet-600 text-white rounded-tr-none' 
-                    : 'bg-zinc-800 text-slate-200 border border-white/10 rounded-tl-none'
+                    : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-tl-none'
                 }`}>
                   {msg.content}
                 </div>
@@ -64,7 +64,7 @@ const Chat = ({ activeConversation, currentUser }) => {
             );
           })
         ) : (
-          <div className="text-center text-gray-500 mt-10">
+          <div className="text-center text-slate-500 mt-10">
             No messages yet. Start the collaboration by sending a message!
           </div>
         )}
@@ -73,9 +73,9 @@ const Chat = ({ activeConversation, currentUser }) => {
       </div>
 
       {/* Chroma Input Bar (Telegram-Style) */}
-      <div className="p-4 bg-gradient-to-t from-zinc-950 to-transparent">
-        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-violet-500/50 transition-all backdrop-blur-2xl">
-          <button type="button" className="p-2 text-slate-500 hover:text-violet-400 transition-colors">
+      <div className="p-4 pt-2">
+        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-2 focus-within:border-violet-500/50 transition-all shadow-sm">
+          <button type="button" className="p-2 text-slate-400 hover:text-violet-500 dark:text-slate-500 dark:hover:text-violet-400 transition-colors">
             <PhotoIcon className="w-6 h-6" />
           </button>
           
@@ -83,7 +83,7 @@ const Chat = ({ activeConversation, currentUser }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message to collaborate..."
-            className="flex-1 bg-transparent border-none text-slate-100 focus:ring-0 placeholder-slate-600 text-sm"
+            className="flex-1 bg-transparent border-none text-slate-900 dark:text-slate-100 focus:ring-0 placeholder-slate-400 dark:placeholder-slate-600 text-sm"
           />
 
           <motion.button

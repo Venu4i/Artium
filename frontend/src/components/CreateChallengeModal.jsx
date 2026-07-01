@@ -12,6 +12,8 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
     const [mediaType, setMediaType] = useState("Image");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [coverFile, setCoverFile] = useState(null);
+    const [coverPreview, setCoverPreview] = useState(null);
     const [artType, setArtType] = useState("");
     const [aiDescription, setAiDescription] = useState("");
     const [generatedChallenges, setGeneratedChallenges] = useState(null);
@@ -27,13 +29,18 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
             setIsSubmitting(true);
             setError(null);
 
-            await challengeService.createChallenge(communityId, {
-                title,
-                description,
-                deadline,
-                maxPoints: Number(maxPoints),
-                mediaTypeAccepted: mediaType.toLowerCase()
-            });
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("description", description);
+            formData.append("deadline", deadline);
+            formData.append("maxPoints", Number(maxPoints));
+            formData.append("mediaTypeAccepted", mediaType.toLowerCase());
+            
+            if (coverFile) {
+                formData.append("coverImage", coverFile);
+            }
+
+            await challengeService.createChallenge(communityId, formData);
 
             onSuccess();
             onClose();
@@ -180,9 +187,32 @@ const CreateChallengeModal = ({ isOpen, onClose, onSuccess }) => {
 
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-community-outline uppercase tracking-widest">Cover Image</label>
-                            <div className="w-full border-2 border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center gap-1 hover:border-community-secondary/50 transition-colors cursor-pointer bg-black/20">
-                                <span className="material-symbols-outlined text-2xl text-community-outline">cloud_upload</span>
-                                <span className="text-xs text-community-outline">Click to upload challenge banner</span>
+                            <div className="w-full border-2 border-dashed border-white/20 rounded-xl p-4 flex flex-col items-center justify-center gap-1 hover:border-community-secondary/50 transition-colors cursor-pointer bg-black/20 relative overflow-hidden group">
+                                {coverPreview ? (
+                                    <>
+                                        <img src={coverPreview} alt="Cover" className="w-full h-32 object-cover opacity-60 group-hover:opacity-40 transition-opacity rounded-lg" />
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="material-symbols-outlined text-2xl text-white drop-shadow-md">upload</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="material-symbols-outlined text-2xl text-community-outline">cloud_upload</span>
+                                        <span className="text-xs text-community-outline">Click to upload challenge banner</span>
+                                    </>
+                                )}
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setCoverFile(file);
+                                            setCoverPreview(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
                             </div>
                         </div>
 

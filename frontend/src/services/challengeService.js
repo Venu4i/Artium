@@ -37,7 +37,9 @@ const challengeService = {
     // Admin: Create Challenge
     createChallenge: async (communityId, challengeData) => {
         try {
-            const response = await api.post(`/challenges/${communityId}`, challengeData);
+            const isFormData = challengeData instanceof FormData;
+            const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : {};
+            const response = await api.post(`/challenges/${communityId}`, challengeData, { headers });
             return response.data;
         } catch (error) {
             console.error("Error creating challenge:", error);

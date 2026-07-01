@@ -19,16 +19,16 @@ const ConversationSidebar = ({ conversations, activeId, onSelect }) => {
           return (
             <motion.div
               key={conv._id}
-              whileHover={{ x: 5, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
+              whileHover={{ x: 5, backgroundColor: "rgba(139, 92, 246, 0.05)" }}
               onClick={() => onSelect(conv)}
               className={`p-4 flex items-center gap-4 cursor-pointer transition-all border-l-4 ${
-                isActive ? 'border-violet-600 bg-white/5' : 'border-transparent'
+                isActive ? 'border-violet-600 bg-violet-50 dark:bg-white/5' : 'border-transparent'
               }`}
             >
               <div className="relative">
                 <img 
                   src={artist?.profilePicture || artist?.avatar || "https://ui-avatars.com/api/?name=" + (artist?.username || "A")} 
-                  className="w-12 h-12 rounded-full object-cover border border-white/10"
+                  className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-white/10"
                   alt="avatar"
                 />
                 {conv.unreadCounts?.[artist?._id] > 0 && (
@@ -40,10 +40,10 @@ const ConversationSidebar = ({ conversations, activeId, onSelect }) => {
               
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline">
-                  <h4 className="text-sm font-semibold text-slate-100 truncate">{artist?.username}</h4>
-                  <span className="text-[10px] text-slate-500">12:45 PM</span>
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{artist?.username}</h4>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500">12:45 PM</span>
                 </div>
-                <p className="text-xs text-slate-400 truncate mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
                   {conv.lastMessage?.content || "No messages yet..."}
                 </p>
               </div>

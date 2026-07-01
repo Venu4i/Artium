@@ -23,11 +23,14 @@ export const createChallenge = async (req, res) => {
         throw new ApiError(403, "Unauthorized: Only the admin can create challenges");
     }
 
+    const bannerImage = req.file?.path;
+
     const challenge = await Challenge.create({
         title,
         description,
         community: communityId,
         createdBy: req.user._id,
+        bannerImage: bannerImage || "",
         deadline: new Date(deadline),
         mediaTypeAccepted: mediaTypeAccepted || "any",
         maxPoints: Number(maxPoints) || 100,

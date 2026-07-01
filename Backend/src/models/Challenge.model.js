@@ -14,7 +14,7 @@ const challengeSchema = new mongoose.Schema(
             ref: "User", 
             required: true 
         },
-        // bannerImage: { type: String },
+        bannerImage: { type: String },
         deadline: { type: Date, required: true },
         mediaTypeAccepted: { type: String, default: "any" }, // e.g., "image", "audio", "video", "text", "any"
         maxPoints: { type: Number, required: true, default: 100 },

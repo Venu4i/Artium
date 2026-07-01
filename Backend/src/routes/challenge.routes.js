@@ -17,7 +17,7 @@ const router = Router();
 router.use(verifyJWT);
 
 // Create Challenge (Admin)
-router.post("/:communityId", createChallenge);
+router.post("/:communityId", upload.single("coverImage"), createChallenge);
 
 // Get community challenges
 router.get("/community/:communityId", getCommunityChallenges);
