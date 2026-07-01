@@ -46,7 +46,7 @@ const challengeService = {
     },
 
     generateArtChallenge: async (data) => {
-        const res = await api.post("/art-challenge", data);
+        const res = await api.post("/ai/art-challenge", data);
         return res.data;
     },
 
